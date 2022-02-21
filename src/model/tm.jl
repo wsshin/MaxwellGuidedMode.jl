@@ -108,14 +108,14 @@ function complete_fields(β::Number,  # propagation constant
                          πcmps::Tuple2{AbsMatNumber},
                          mdl::ModelTM)
     # Calculate the transverse components of the complementary field.
-    βF′ₜgen = create_βF′ₜgen(ft, ω, Ps, ∇̽s, πcmps)
-    f′ₜ = (βF′ₜgen * fₜ) ./ β
+    βf′ₜ4fₜ = create_βf′ₜ4fₜ(ft, ω, Ps, ∇̽s, πcmps)
+    f′ₜ = (βf′ₜ4fₜ * fₜ) ./ β
 
     eₜ, hₜ = ft==EE ? (fₜ,f′ₜ) : (f′ₜ,fₜ)
 
     # Calculate the longitudinal component of the E-field.
-    iEₗgen = create_iEₗgen(ω, Ps, ∇̽s)
-    eₗ = (iEₗgen * hₜ) ./ im
+    ⅈeₗ4hₜ = create_ⅈeₗ4hₜ(ω, Ps, ∇̽s)
+    eₗ = (ⅈeₗ4hₜ * hₜ) ./ im
 
     # Take the Cartesian components of the fields and reshape them into arrays.
     sz_grid = size(mdl.grid)

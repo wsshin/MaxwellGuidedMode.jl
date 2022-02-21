@@ -122,32 +122,32 @@ function complete_fields(β::Number,  # propagation constant
     ft′ = alter(ft)
 
     # Calculate the transverse components of the complementary field.
-    βF′ₜgen = create_βF′ₜgen(ft, ω, Ps, ∇̽s, πcmps)
-    f′ₜ = (βF′ₜgen * fₜ) ./ β
+    βf′ₜ4fₜ = create_βf′ₜ4fₜ(ft, ω, Ps, ∇̽s, πcmps)
+    f′ₜ = (βf′ₜ4fₜ * fₜ) ./ β
 
     # Calculate the longitudinal components of the main and complementary fields.
-    iF′ₗgen = create_iF′ₗgen(ft, ω, Ps, ∇̽s)
-    iFₗgen = create_iF′ₗgen(ft′, ω, Ps, ∇̽s)
+    ⅈf′ₗ4fₜ = create_ⅈf′ₗ4fₜ(ft, ω, Ps, ∇̽s)
+    ⅈfₗ4f′ₜ = create_ⅈf′ₗ4fₜ(ft′, ω, Ps, ∇̽s)
 
-    fₗ = (iFₗgen * f′ₜ) ./ im
-    f′ₗ = (iF′ₗgen * fₜ) ./ im
+    fₗ = (ⅈfₗ4f′ₜ * f′ₜ) ./ im
+    f′ₗ = (ⅈf′ₗ4fₜ * fₜ) ./ im
 
     # Take the Cartesian components of the fields and reshape them into arrays.
     sz = size(mdl, ft)
     sz′ = size(mdl, ft′)
     @assert sz′ == sz
 
-    fₜ = reshape(fₜ, sz)
-    f′ₜ = reshape(f′ₜ, sz)
+    Fₜ = reshape(fₜ, sz)
+    F′ₜ = reshape(f′ₜ, sz)
 
     order_cmpfirst = mdl.order_cmpfirst
     d = order_cmpfirst ? 1 : length(sz)
 
-    Fx = selectdim(fₜ, d, 1)
-    Fy = selectdim(fₜ, d, 2)
+    Fx = selectdim(Fₜ, d, 1)
+    Fy = selectdim(Fₜ, d, 2)
 
-    F′x = selectdim(f′ₜ, d, 1)
-    F′y = selectdim(f′ₜ, d, 2)
+    F′x = selectdim(F′ₜ, d, 1)
+    F′y = selectdim(F′ₜ, d, 2)
 
     sz_grid = size(mdl.grid)
     Fz = reshape(fₗ, sz_grid)

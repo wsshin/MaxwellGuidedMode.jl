@@ -1,6 +1,6 @@
 export create_paramops, create_curls, create_πcmps
-export create_iF′ₗgen, create_iHₗgen, create_iEₗgen
-export create_βF′ₜgen, create_βHₜgen, create_βEₜgen
+export create_ⅈf′ₗ4fₜ, create_ⅈhₗ4eₜ, create_ⅈeₗ4hₜ  # ⅈ is entered by \bbii<tab>
+export create_βf′ₜ4fₜ, create_βhₜ4eₜ, create_βeₜ4hₜ
 export create_A
 export calc_mode
 
@@ -86,15 +86,15 @@ function create_πcmps(mdl::Model{K}) where {K}
     return πcmpₑ, πcmpₘ
 end
 
-create_iHₗgen(ω, Ps::Tuple22{AbsMatNumber}, ∇̽s::Tuple22{AbsMatNumber}) = create_iF′ₗgen(EE, ω, Ps, ∇̽s)
-create_iEₗgen(ω, Ps::Tuple22{AbsMatNumber}, ∇̽s::Tuple22{AbsMatNumber}) = create_iF′ₗgen(HH, ω, Ps, ∇̽s)
+create_ⅈhₗ4eₜ(ω, Ps::Tuple22{AbsMatNumber}, ∇̽s::Tuple22{AbsMatNumber}) = create_ⅈf′ₗ4fₜ(EE, ω, Ps, ∇̽s)
+create_ⅈeₗ4hₜ(ω, Ps::Tuple22{AbsMatNumber}, ∇̽s::Tuple22{AbsMatNumber}) = create_ⅈf′ₗ4fₜ(HH, ω, Ps, ∇̽s)
 
-create_iF′ₗgen(ft, ω, Ps::Tuple22{AbsMatNumber}, ∇̽s::Tuple22{AbsMatNumber}) =
-    create_iF′ₗgen(ft, ω, Ps[2], ∇̽s[1])
+create_ⅈf′ₗ4fₜ(ft, ω, Ps::Tuple22{AbsMatNumber}, ∇̽s::Tuple22{AbsMatNumber}) =
+    create_ⅈf′ₗ4fₜ(ft, ω, Ps[2], ∇̽s[1])
 
 # Create the operator that generates im * F′ₗ from Fₜ, where F′ is the field complementary
 # to F (e.g., F′ = H-field for F = E-field).
-function create_iF′ₗgen(ft::FieldType,  # type of input field Fₜ, not output field F′ₗ
+function create_ⅈf′ₗ4fₜ(ft::FieldType,  # type of input field Fₜ, not output field F′ₗ
                         ω::Number,
                         Pₗs::Tuple2{AbsMatNumber},
                         ∇̽ₜs::Tuple2{AbsMatNumber})
@@ -112,14 +112,14 @@ function create_iF′ₗgen(ft::FieldType,  # type of input field Fₜ, not outp
 end
 
 
-create_βHₜgen(ω, Ps, ∇̽s, πcmps) = create_βF′ₜgen(EE, ω, Ps, ∇̽s, πcmps)
-create_βEₜgen(ω, Ps, ∇̽s, πcmps) = create_βF′ₜgen(HH, ω, Ps, ∇̽s, πcmps)
+create_βhₜ4eₜ(ω, Ps, ∇̽s, πcmps) = create_βf′ₜ4fₜ(EE, ω, Ps, ∇̽s, πcmps)
+create_βeₜ4hₜ(ω, Ps, ∇̽s, πcmps) = create_βf′ₜ4fₜ(HH, ω, Ps, ∇̽s, πcmps)
 
-# Create the operator that generates β * F′ₜ, where F′ is the field complementary to F (e.g.,
-# F′ = H-field for F = E-field).
-create_βF′ₜgen(ft, ω, Ps, ∇̽s, πcmps) = sum(create_βF′ₜgen_comps(ft, ω, Ps, ∇̽s, πcmps))
+# Create the operator that generates β * F′ₜ from Fₜ, where F′ is the field complementary to
+# F (e.g., F′ = H-field for F = E-field).
+create_βf′ₜ4fₜ(ft, ω, Ps, ∇̽s, πcmps) = sum(create_βf′ₜ4fₜ_comps(ft, ω, Ps, ∇̽s, πcmps))
 
-function create_βF′ₜgen_comps(ft::FieldType,  # type of input field Fₜ, not output field F′ₗ
+function create_βf′ₜ4fₜ_comps(ft::FieldType,  # type of input field Fₜ, not output field F′ₗ
                               ω::Number,
                               Ps::Tuple22{AbsMatNumber},
                               ∇̽s::Tuple22{AbsMatNumber},
@@ -136,16 +136,16 @@ function create_βF′ₜgen_comps(ft::FieldType,  # type of input field Fₜ, n
     ∇̽′ₗ = ∇̽ₗs[nft′]
     πcmp = πcmps[nft]
 
-    βF′ₜgen₁ = (α .* πcmp) * Pₜ
+    βf′ₜ4fₜ₁ = (α .* πcmp) * Pₜ
 
     if length(Pₗs[nft′]) > 0
-        iF′ₗgen = create_iF′ₗgen(ft, ω, Pₗs, ∇̽ₜs)
-        βF′ₜgen₂ = (πcmp * ∇̽′ₗ) * iF′ₗgen
+        ⅈf′ₗ4fₜ = create_ⅈf′ₗ4fₜ(ft, ω, Pₗs, ∇̽ₜs)
+        βf′ₜ4fₜ₂ = (πcmp * ∇̽′ₗ) * ⅈf′ₗ4fₜ
     else
-        βF′ₜgen₂ = spzeros(eltype(βF′ₜgen₁), size(βF′ₜgen₁)...)
+        βf′ₜ4fₜ₂ = spzeros(eltype(βf′ₜ4fₜ₁), size(βf′ₜ4fₜ₁)...)
     end
 
-    return βF′ₜgen₁, βF′ₜgen₂
+    return βf′ₜ4fₜ₁, βf′ₜ4fₜ₂
 end
 
 function create_A(ft::FieldType,  # type of input field Fₜ
@@ -156,16 +156,16 @@ function create_A(ft::FieldType,  # type of input field Fₜ
     ft′ = alter(ft)
 
     # Old implementation.  Though more straightforward, this implementation does not
-    # gurantee the vector calculus identity βFₜgen₂ * βF′ₜgen₂ = 0 due to rounding errors.
+    # gurantee the vector calculus identity βfₜ4f′ₜ₂ * βf′ₜ4fₜ₂ = 0 due to rounding errors.
     #
-    # βF′ₜgen = create_βF′ₜgen(ft, ω, Ps, ∇̽s, πcmps)
-    # βFₜgen = create_βF′ₜgen(ft′, ω, Ps, ∇̽s, πcmps)
-    # A = βFₜgen * βF′ₜgen
+    # βf′ₜ4fₜ = create_βf′ₜ4fₜ(ft, ω, Ps, ∇̽s, πcmps)
+    # βfₜ4f′ₜ = create_βf′ₜ4fₜ(ft′, ω, Ps, ∇̽s, πcmps)
+    # A = βfₜ4f′ₜ * βf′ₜ4fₜ
 
-    βF′ₜgen₁, βF′ₜgen₂ = create_βF′ₜgen_comps(ft, ω, Ps, ∇̽s, πcmps)
-    βFₜgen₁, βFₜgen₂ = create_βF′ₜgen_comps(ft′, ω, Ps, ∇̽s, πcmps)
+    βf′ₜ4fₜ₁, βf′ₜ4fₜ₂ = create_βf′ₜ4fₜ_comps(ft, ω, Ps, ∇̽s, πcmps)
+    βfₜ4f′ₜ₁, βfₜ4f′ₜ₂ = create_βf′ₜ4fₜ_comps(ft′, ω, Ps, ∇̽s, πcmps)
 
-    A = βFₜgen₁ * βF′ₜgen₁ + βFₜgen₁ * βF′ₜgen₂ + βFₜgen₂ * βF′ₜgen₁  # βFₜgen₂ * βF′ₜgen₂ = 0 always
+    A = βfₜ4f′ₜ₁ * βf′ₜ4fₜ₁ + βfₜ4f′ₜ₁ * βf′ₜ4fₜ₂ + βfₜ4f′ₜ₂ * βf′ₜ4fₜ₁  # βfₜ4f′ₜ₂ * βf′ₜ4fₜ₂ = 0 always
 
     return A
 end
