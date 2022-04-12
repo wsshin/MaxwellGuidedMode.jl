@@ -68,8 +68,21 @@ function (df::DispersiveField)(Ω::Real)
     return F
 end
 
+function (df::DispersiveField)(Ω::AbsVecReal)
+    sz_shp = size(df)
+    NΩ = length(Ω)
+    F = ArrComplexF(undef, NΩ, sz_shp...)
+
+    CI = CartesianIndices(sz_shp)
+    for ci = CI
+        F[:,ci] .= df.Fᵣ_fun[ci].(Ω) .+ im .* df.Fᵢ_fun[ci].(Ω)
+    end
+
+    return F
+end
+
 # Interpolate a given tuple of fields at Ω.
-(df::NTuple{N,DispersiveField})(Ω::Real) where {N} = ntuple(k->df[k](Ω), Val(N))
+(df::NTuple{N,DispersiveField})(Ω::Union{Real,AbsVecReal}) where {N} = ntuple(k->df[k](Ω), Val(N))
 
 # Create interpolated quantities related to dispersion.  These quantities are usually
 # calculated around a specific frequency ω₀, which is provided to the function.
