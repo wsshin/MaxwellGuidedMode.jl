@@ -5,10 +5,10 @@ export complete_fields
 
 # Do not export Model; quality it with the package name MaxwellFDFD, because I would have
 # similar types in other packages such as MaxwellSALT and MaxwellGuide.
-Base.@kwdef mutable struct Model{K,Kₑ,Kₘ,
-                                 Kₑₜ,Kₘₜ,Kₑₗ,Kₘₗ,
-                                 K²,
-                                 K₊₂,AK₊₂<:AbsArrComplexF{K₊₂}}
+@with_kw mutable struct Model{K,Kₑ,Kₘ,
+                              Kₑₜ,Kₘₜ,Kₑₗ,Kₘₗ,
+                              K²,
+                              K₊₂,AK₊₂<:AbsArrComplexF{K₊₂}}
     # Frequency
     ωpml::Number = 0.0  # can be complex
 
@@ -71,17 +71,19 @@ create_e⁻ⁱᵏᴸ(mdl::Model) = exp.(-im .* mdl.kbloch .* mdl.grid.L)
 
 # Main functions
 function clear_objs!(mdl::Model)
-    mdl.εₜarr .= 0
-    mdl.μₜarr .= 0
+    @unpack εₜarr, μₜarr, εₗarr, μₗarr, oind2shp, oind2εind, oind2μind, εind2ε, μind2μ = mdl
+    
+    εₜarr .= 0
+    μₜarr .= 0
 
-    mdl.εₗarr .= 0
-    mdl.μₗarr .= 0
+    εₗarr .= 0
+    μₗarr .= 0
 
-    empty!(mdl.oind2shp)
-    empty!(mdl.oind2εind)
-    empty!(mdl.oind2μind)
-    empty!(mdl.εind2ε)
-    empty!(mdl.μind2μ)
+    empty!(oind2shp)
+    empty!(oind2εind)
+    empty!(oind2μind)
+    empty!(εind2ε)
+    empty!(μind2μ)
 
     return nothing
 end
@@ -96,9 +98,10 @@ function MaxwellBase.add_obj!(mdl::Model{K}, matname::String, shapes::Shape{K}..
     isbidirectional(EE, mat, mdl) || @error "ε = $ε should not couple transverse and longitudinal fields."
     isbidirectional(HH, mat, mdl) || @error "μ = $μ should not couple transverse and longitudinal fields."
 
+    @unpack oind2shp, oind2εind, oind2μind, εind2ε, μind2μ = mdl
     for shp = shapes  # shapes is tuple
         obj = Object(shp, mat)
-        add_obj!(mdl.oind2shp, (mdl.oind2εind,mdl.oind2μind), (mdl.εind2ε,mdl.μind2μ), obj)
+        add_obj!(oind2shp, (oind2εind,oind2μind), (εind2ε,μind2μ), obj)
     end
 
     return nothing
@@ -108,8 +111,10 @@ end
 # components of the fields; false otherwise.
 function isbidirectional(ft::FieldType, mat::Material, mdl::Model)
     nft = Int(ft)
-    cmpₜ = (mdl.cmpₑₜ, mdl.cmpₘₜ)[nft]
-    cmpₗ = (mdl.cmpₑₗ, mdl.cmpₘₗ)[nft]
+    @unpack cmpₑₜ, cmpₘₜ, cmpₑₗ, cmpₘₗ = mdl
+
+    cmpₜ = (cmpₑₜ, cmpₘₜ)[nft]
+    cmpₗ = (cmpₑₗ, cmpₘₗ)[nft]
 
     param = mat.param[nft]
 
@@ -123,11 +128,12 @@ function complete_fields end
 function field2vec(E::NTuple{Kₑ,AbsVecNumber{K}}, H::NTuple{Kₘ,AbsVecNumber{K}},
                    mdl::Model{K,Kₑ,Kₘ}
                    ) where {K,Kₑ,Kₘ}
-    U = mdl.ft_eq==EE ? E : H
-    cmpᵤₜ = mdl.ft_eq==EE ? mdl.cmpₑₜ : mdl.cmpₘₜ
+    @unpack ft_eq, cmpₑₜ, cmpₘₜ, order_cmpfirst = mdl
+
+    U = ft_eq==EE ? E : H
+    cmpᵤₜ = ft_eq==EE ? cmpₑₜ : cmpₘₜ
     Uₜ = cat(U[cmpᵤₜ]..., dims=K+1)
 
-    order_cmpfirst = mdl.order_cmpfirst
     if order_cmpfirst
         Uₜ = permutedims(Uₜ, circshift(1:K, 1))
     end

@@ -5,13 +5,11 @@ export create_A
 export calc_mode
 
 function create_stretched_∆ls(mdl::Model)
-    ωpml = mdl.ωpml
-    grid = mdl.grid
-    Npml = mdl.Npml
+    @unpack ωpml, grid, Npml, boundft = mdl
+
     s∆l = create_stretched_∆l(ωpml, grid, Npml)
     s∆l⁻¹ = invert_∆l(s∆l)
 
-    boundft = mdl.boundft
     gtₑ = ft2gt.(EE, boundft)
     gtₘ = ft2gt.(HH, boundft)
 
@@ -27,22 +25,23 @@ function create_paramops(mdl::Model{K,Kₑ,Kₘ,Kₑₜ,Kₘₜ}) where {K,Kₑ,
     (s∆lₑ, s∆lₘ), (s∆lₑ⁻¹, s∆lₘ⁻¹) = create_stretched_∆ls(mdl)
     calc_matparams!(mdl)  # assignment and smoothing; implemented for each specialized alias of Model
 
-    boundft = mdl.boundft
-    isbloch = mdl.grid.isbloch
+    @unpack grid, boundft, εₜarr, μₜarr, εₗarr, μₗarr, order_cmpfirst = mdl
+    isbloch = grid.isbloch
+
     e⁻ⁱᵏᴸ = create_e⁻ⁱᵏᴸ(mdl)
 
     isfwd_inₑ = boundft.!=EE
     isfwd_inₘ = boundft.!=HH
 
-    Pεₜ = Kₑₜ==1 ? create_paramop(mdl.εₜarr; mdl.order_cmpfirst) :
-                   create_paramop(mdl.εₜarr, isfwd_inₑ, s∆lₘ, s∆lₑ⁻¹, isbloch, e⁻ⁱᵏᴸ; mdl.order_cmpfirst)
-    Pμₜ = Kₘₜ==1 ? create_paramop(mdl.μₜarr; mdl.order_cmpfirst) :
-                   create_paramop(mdl.μₜarr, isfwd_inₘ, s∆lₑ, s∆lₘ⁻¹, isbloch, e⁻ⁱᵏᴸ; mdl.order_cmpfirst)
+    Pεₜ = Kₑₜ==1 ? create_paramop(εₜarr; order_cmpfirst) : 
+                  create_paramop(εₜarr, isfwd_inₑ, s∆lₘ, s∆lₑ⁻¹, isbloch, e⁻ⁱᵏᴸ; order_cmpfirst)
+    Pμₜ = Kₘₜ==1 ? create_paramop(μₜarr; order_cmpfirst) :
+                  create_paramop(μₜarr, isfwd_inₘ, s∆lₑ, s∆lₘ⁻¹, isbloch, e⁻ⁱᵏᴸ; order_cmpfirst)
 
     # The following lines work even if the model does not deal with the corresponding
     # longitudinal components.
-    Pεₗ = create_paramop(mdl.εₗarr; mdl.order_cmpfirst)  # 0×0 matrix for Kₑₗ = 0 (no longitudinal E-field)
-    Pμₗ = create_paramop(mdl.μₗarr; mdl.order_cmpfirst)  # 0×0 matrix for Kₘₗ = 0 (no longitudinal H-field)
+    Pεₗ = create_paramop(εₗarr; order_cmpfirst)  # 0×0 matrix for Kₑₗ = 0 (no longitudinal E-field)
+    Pμₗ = create_paramop(μₗarr; order_cmpfirst)  # 0×0 matrix for Kₘₗ = 0 (no longitudinal H-field)
 
     return (Pεₜ,Pμₜ), (Pεₗ,Pμₗ)
 end
@@ -50,13 +49,9 @@ end
 function create_curls(mdl::Model)
     _, (s∆lₑ⁻¹, s∆lₘ⁻¹) = create_stretched_∆ls(mdl)
 
-    boundft = mdl.boundft
+    @unpack grid, boundft, cmpₛ, cmpₑₜ, cmpₘₜ, cmpₑₗ, cmpₘₗ, order_cmpfirst = mdl
+    isbloch = grid.isbloch
 
-    cmpₛ = mdl.cmpₛ
-    cmpₑₜ, cmpₘₜ = mdl.cmpₑₜ, mdl.cmpₘₜ
-    cmpₑₗ, cmpₘₗ = mdl.cmpₑₗ, mdl.cmpₘₗ
-
-    isbloch = mdl.grid.isbloch
     e⁻ⁱᵏᴸ = create_e⁻ⁱᵏᴸ(mdl)
 
     isfwdₑ = boundft.==EE
@@ -64,24 +59,23 @@ function create_curls(mdl::Model)
 
     # The following lines work even if the model does not deal with the corresponding
     # longitudinal components.
-    ∇̽ₑₜ = create_curl(isfwdₑ, s∆lₘ⁻¹, isbloch, e⁻ⁱᵏᴸ; cmp_shp=cmpₛ, cmp_out=cmpₘₗ, cmp_in=cmpₑₜ, mdl.order_cmpfirst)
-    ∇̽ₘₜ = create_curl(isfwdₘ, s∆lₑ⁻¹, isbloch, e⁻ⁱᵏᴸ; cmp_shp=cmpₛ, cmp_out=cmpₑₗ, cmp_in=cmpₘₜ, mdl.order_cmpfirst)
+    ∇̽ₑₜ = create_curl(isfwdₑ, s∆lₘ⁻¹, isbloch, e⁻ⁱᵏᴸ; cmp_shp=cmpₛ, cmp_out=cmpₘₗ, cmp_in=cmpₑₜ, order_cmpfirst)
+    ∇̽ₘₜ = create_curl(isfwdₘ, s∆lₑ⁻¹, isbloch, e⁻ⁱᵏᴸ; cmp_shp=cmpₛ, cmp_out=cmpₑₗ, cmp_in=cmpₘₜ, order_cmpfirst)
 
-    ∇̽ₑₗ = create_curl(isfwdₑ, s∆lₘ⁻¹, isbloch, e⁻ⁱᵏᴸ; cmp_shp=cmpₛ, cmp_out=cmpₘₜ, cmp_in=cmpₑₗ, mdl.order_cmpfirst)
-    ∇̽ₘₗ = create_curl(isfwdₘ, s∆lₑ⁻¹, isbloch, e⁻ⁱᵏᴸ; cmp_shp=cmpₛ, cmp_out=cmpₑₜ, cmp_in=cmpₘₗ, mdl.order_cmpfirst)
+    ∇̽ₑₗ = create_curl(isfwdₑ, s∆lₘ⁻¹, isbloch, e⁻ⁱᵏᴸ; cmp_shp=cmpₛ, cmp_out=cmpₘₜ, cmp_in=cmpₑₗ, order_cmpfirst)
+    ∇̽ₘₗ = create_curl(isfwdₘ, s∆lₑ⁻¹, isbloch, e⁻ⁱᵏᴸ; cmp_shp=cmpₛ, cmp_out=cmpₑₜ, cmp_in=cmpₘₗ, order_cmpfirst)
 
     return (∇̽ₑₜ,∇̽ₘₜ), (∇̽ₑₗ,∇̽ₘₗ)
 end
 
 function create_πcmps(mdl::Model{K}) where {K}
-    grid = mdl.grid
-    cmpₑₜ, cmpₘₜ = mdl.cmpₑₜ, mdl.cmpₘₜ
+    @unpack grid, cmpₑₜ, cmpₘₜ, order_cmpfirst = mdl
 
     permute = reverse(SVec(ntuple(identity, Val(K))))
     scale₀ = SFloat(1,-1)
 
-    πcmpₑ = create_πcmp(grid.N, permute, scale=scale₀[cmpₑₜ]; mdl.order_cmpfirst)
-    πcmpₘ = create_πcmp(grid.N, permute, scale=scale₀[cmpₘₜ]; mdl.order_cmpfirst)
+    πcmpₑ = create_πcmp(grid.N, permute, scale=scale₀[cmpₑₜ]; order_cmpfirst)
+    πcmpₘ = create_πcmp(grid.N, permute, scale=scale₀[cmpₘₜ]; order_cmpfirst)
 
     return πcmpₑ, πcmpₘ
 end

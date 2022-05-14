@@ -2,6 +2,7 @@ module MaxwellGuidedMode
 
 using Reexport
 @reexport using MaxwellBase
+using Parameters
 using AbbreviatedTypes
 using SimpleConstants
 using VoxelwiseConstantMapping

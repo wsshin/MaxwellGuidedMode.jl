@@ -68,7 +68,7 @@ function powerₗ(E::NTuple{Kₑ,AbsArrNumber{K}},
     Sz = S[end]
 
     gtₑ = ft2gt.(HH, mdl.boundft)
-    lvxl = t_ind(mdl.grid.ghosted.l, gtₑ)  # locations of x-normal edges of E-field pixels surrounding Sz
+    lvxl = t_ind(mdl.grid.ghosted.lg, gtₑ)  # locations of x-normal edges of E-field pixels surrounding Sz
 
     vc = VoxelwiseConstant(Sz, lvxl)
     Pz = integral(vc)

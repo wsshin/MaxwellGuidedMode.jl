@@ -30,41 +30,22 @@ end
 # Assign the material parameters on the grid and smooth them.
 function calc_matparams!(mdl::ModelTE)
     # Take necessary fields of mdl.
-    grid = mdl.grid
+    @unpack grid, boundft, 
+            εₜarr, µₜarr, µₗarr, 
+            oind2shp, oind2εind, oind2μind, εind2ε, μind2μ, 
+            cmpₑₜ, cmpₘₜ, cmpₘₗ,
+            iseₜ˔shp, ishₜ˔shp = mdl
+        
+    @unpack isbloch, N, l, σ, ghosted = grid
+    @unpack lg, τlg, ∆τ = ghosted
 
-    isbloch = grid.isbloch
-    N = grid.N
-    l = grid.l
-    σ = grid.σ
-
-    lg = grid.ghosted.l
-    τl = grid.ghosted.τl
-    ∆τ = grid.ghosted.∆τ
-
-    boundft = mdl.boundft
     gtₑ = ft2gt.(EE,boundft)
     gtₘ = ft2gt.(HH,boundft)
-
-    εₜarr = mdl.εₜarr
-    µₜarr = mdl.μₜarr
-    µₗarr = mdl.μₗarr
-
-    oind2shp = mdl.oind2shp
-    oind2εind = mdl.oind2εind
-    oind2μind = mdl.oind2μind
-    εind2ε = mdl.εind2ε
-    μind2μ = mdl.μind2μ
-
-    cmpₑₜ = mdl.cmpₑₜ
-    cmpₘₜ = mdl.cmpₘₜ
-    cmpₘₗ = mdl.cmpₘₗ
 
     εind2εₜ = sub_pind2matprm(εind2ε, cmpₑₜ)
     μind2μₜ = sub_pind2matprm(μind2μ, cmpₘₜ)
     μind2μₗ = sub_pind2matprm(μind2μ, cmpₘₗ)
 
-    iseₜ˔shp = mdl.iseₜ˔shp
-    ishₜ˔shp = mdl.ishₜ˔shp
     ishₗ˔shp = true
 
     # Create temporary storages.
@@ -79,9 +60,9 @@ function calc_matparams!(mdl::ModelTE)
     # are the E-field locations; see the definition MaxwellBase/assign_param!().
     # (See the figure in L10 - Eigenmode Analysis > 1.3 Waveguide mode analysis > Matrix
     # equation formulation; take the cross section through Ey, Hx, Hz.)
-    assign_param!(εₜarr, tuple(pₗ_oind2d), oind2shp, oind2εind, εind2εₜ, gtₑ, τl, isbloch)  # εₜ tensors (rank-0, so scalars)
-    assign_param!(µₜarr, tuple(pₗ_oind2d′), oind2shp, oind2μind, μind2μₜ, gtₑ, τl, isbloch)  # μₜ tensors (rank-0, so scalars)
-    assign_param!(µₗarr, tuple(pₜ_oind2d), oind2shp, oind2μind, μind2μₗ, gtₘ, τl, isbloch)  # μₗ tensors (rank-0, so scalars)
+    assign_param!(εₜarr, tuple(pₗ_oind2d), oind2shp, oind2εind, εind2εₜ, gtₑ, τlg, isbloch)  # εₜ tensors (rank-0, so scalars)
+    assign_param!(µₜarr, tuple(pₗ_oind2d′), oind2shp, oind2μind, μind2μₜ, gtₑ, τlg, isbloch)  # μₜ tensors (rank-0, so scalars)
+    assign_param!(µₗarr, tuple(pₜ_oind2d), oind2shp, oind2μind, μind2μₗ, gtₘ, τlg, isbloch)  # μₗ tensors (rank-0, so scalars)
 
     # Some temporary arrays should be identical.  Specifically, εyy_oind2d and μxx_oind2d
     # are evaluated at the locations surrounding the εyy and μxx locations, which are the
