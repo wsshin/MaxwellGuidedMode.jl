@@ -5,7 +5,7 @@ export calc_disp
 # Calculate the unnormalized Ω from normalized ω.
 function ω2Ω(ω::AbstractRange{<:Real}, ω₀::Real, unit::MaxwellUnit)
     ωmin, ωmax = ω[1], ω[end]
-    ωmin ≤ ω₀ ≤ ωmax || @error "ω₀ = $ω₀ should be within range of ω."
+    @argcheck ωmin ≤ ω₀ ≤ ωmax  # ω₀ should be within range of ω
 
     # Convert the units of dm's quantities to the SI units.
     ω₀ *= unit.ω
@@ -35,7 +35,7 @@ function DispersiveField(Ω::AbstractRange{<:Real},
                          F::AbsArrNumber{K₊₁};  # F[Ω,x,y,z]
                          α::Number=1.0  # scale factor
                          ) where {K₊₁}
-    size(F,1)==length(Ω) || @error "size(F,1) = $(size(F,1)) and length(Ω) = $(length(Ω)) should be same."
+    @argcheck size(F,1)==length(Ω)  # size(F,1) and length(Ω) should be same
 
     K = K₊₁ - 1
     dim_shp = SVec(ntuple(k->k+1, Val(K)))  # 2:K+1

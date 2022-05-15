@@ -7,6 +7,7 @@ version = "0.2.7"
 
 [deps]
 AbbreviatedTypes = "1766def0-c946-4dda-a59e-d0d07f8410f7"
+ArgCheck = "dce04be8-c92d-5529-be00-80e4d2c0e197"
 Arpack = "7d9fca2a-8960-54d3-9f78-7d1dccf2cb97"
 Dierckx = "39dd38d3-220a-591b-8e3c-4c3a8c710a94"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"

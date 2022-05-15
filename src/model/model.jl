@@ -95,8 +95,8 @@ MaxwellBase.add_obj!(mdl::Model{K}, matname::String, shapes::AbsVec{<:Shape{K}};
 function MaxwellBase.add_obj!(mdl::Model{K}, matname::String, shapes::Shape{K}...;
                               ε::MatParam=1.0, μ::MatParam=1.0) where {K}
     mat = Material(matname, ε=ε, μ=μ)
-    isbidirectional(EE, mat, mdl) || @error "ε = $ε should not couple transverse and longitudinal fields."
-    isbidirectional(HH, mat, mdl) || @error "μ = $μ should not couple transverse and longitudinal fields."
+    @argcheck isbidirectional(EE, mat, mdl)  # ε should not couple transverse and longitudinal fields
+    @argcheck isbidirectional(HH, mat, mdl)  # μ should not couple transverse and longitudinal fields
 
     @unpack oind2shp, oind2εind, oind2μind, εind2ε, μind2μ = mdl
     for shp = shapes  # shapes is tuple

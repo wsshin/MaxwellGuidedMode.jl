@@ -9,8 +9,8 @@ struct ParametrizedMode{K,Kₑ,Kₘ,Kθ,Kθₛ,NT<:NamedTuple}
 end
 
 function ParametrizedMode(θ::NamedTuple, mdl::Model{K,Kₑ,Kₘ}) where {K,Kₑ,Kₘ}
-    haskey(θ, :ω) || @error "θ = $θ should have entry named ω."
-    all(issorted.(values(θ))) || @error "Each entry of θ should be sorted in ascending order for interpolation."
+    @argcheck haskey(θ, :ω)  # θ should have entry named ω
+    @argcheck all(issorted.(values(θ)))  # each entry of θ should be sorted in ascending order for interpolation
 
     szθ = length.(values(θ))
     Kθ = length(szθ)
