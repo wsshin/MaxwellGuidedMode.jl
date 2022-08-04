@@ -3,7 +3,7 @@ export create_e⁻ⁱᵏᴸ
 export clear_objs!  # plural because clearing both electric and magnetic quantities
 export complete_fields
 
-# Do not export Model; quality it with the package name MaxwellFDFD, because I would have
+# Do not export Model; qualify it with the package name MaxwellFDFD, because I would have
 # similar types in other packages such as MaxwellSALT and MaxwellGuide.
 @with_kw mutable struct Model{K,Kₑ,Kₘ,
                               Kₑₜ,Kₘₜ,Kₑₗ,Kₘₗ,
