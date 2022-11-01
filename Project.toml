@@ -19,6 +19,7 @@ VoxelwiseConstantMapping = "30c4ba4d-5c6d-4df8-9a6f-7ded98721337"
 
 [compat]
 AbbreviatedTypes = "0.2.1 - 0.9"
+ArgCheck = "2.1.0 - 2"
 Arpack = "0.5.3 - 0.9"
 Dierckx = "0.5.1 - 0.9"
 MaxwellBase = "0.1.16 - 0.9"
