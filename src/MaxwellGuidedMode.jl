@@ -4,7 +4,7 @@ using Reexport
 @reexport using MaxwellBase
 using Parameters
 using ArgCheck
-using AbbreviatedTypes
+using AbbreviatedTypes; @define_types_with(Float64)
 using SimpleConstants
 using VoxelwiseConstantMapping
 using Arpack
