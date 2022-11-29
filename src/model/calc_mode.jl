@@ -33,7 +33,7 @@ function create_paramops(mdl::Model{K,Kₑ,Kₘ,Kₑₜ,Kₘₜ}) where {K,Kₑ,
     isfwd_inₑ = boundft.!=EE
     isfwd_inₘ = boundft.!=HH
 
-    Pεₜ = Kₑₜ==1 ? create_paramop(εₜarr; order_cmpfirst) : 
+    Pεₜ = Kₑₜ==1 ? create_paramop(εₜarr; order_cmpfirst) :
                   create_paramop(εₜarr, isfwd_inₑ, s∆lₘ, s∆lₑ⁻¹, isbloch, e⁻ⁱᵏᴸ; order_cmpfirst)
     Pμₜ = Kₘₜ==1 ? create_paramop(μₜarr; order_cmpfirst) :
                   create_paramop(μₜarr, isfwd_inₘ, s∆lₑ, s∆lₘ⁻¹, isbloch, e⁻ⁱᵏᴸ; order_cmpfirst)
