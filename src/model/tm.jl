@@ -32,10 +32,10 @@ function calc_matparams!(mdl::ModelTM)
     # Take necessary fields of mdl.
     @unpack grid, boundft,
             εₜarr, εₗarr, µₜarr,
-            oind2shp, oind2εind, oind2μind, εind2ε, μind2μ, 
+            oind2shp, oind2εind, oind2μind, εind2ε, μind2μ,
             cmpₑₜ, cmpₘₜ, cmpₑₗ,
             iseₜ˔shp, ishₜ˔shp = mdl
-        
+
     @unpack isbloch, N, l, σ, ghosted = grid
     @unpack lg, τlg, ∆τ = ghosted
 

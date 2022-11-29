@@ -26,12 +26,12 @@ end
 # Assign the material parameters on the grid and smooth them.
 function calc_matparams!(mdl::ModelFull)
     # Take necessary fields of mdl.
-    @unpack grid, boundft, 
-            εₜarr, µₜarr, εₗarr, µₗarr, 
-            oind2shp, oind2εind, oind2μind, εind2ε, μind2μ, 
-            cmpₑₜ, cmpₘₜ, cmpₑₗ, cmpₘₗ, 
+    @unpack grid, boundft,
+            εₜarr, µₜarr, εₗarr, µₗarr,
+            oind2shp, oind2εind, oind2μind, εind2ε, μind2μ,
+            cmpₑₜ, cmpₘₜ, cmpₑₗ, cmpₘₗ,
             iseₜ˔shp, ishₜ˔shp = mdl
-        
+
     @unpack isbloch, N, l, σ, ghosted = grid
     @unpack lg, τlg, ∆τ = ghosted
 
