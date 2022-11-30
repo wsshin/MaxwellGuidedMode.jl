@@ -9,13 +9,13 @@ const ModelFull{AK₊₂} = Model{2,3,3, 2,2, 1,1, 4, 4,AK₊₂}
 function ModelFull(grid::Grid; Atype::Type=Array)
     ft_eq = EE
 
-    cmpₛ = SInt{2}(1,2)  # shapes in transverse dimension (xy-plane)
+    cmpₛ = SInt(1,2)  # shapes in transverse dimension (xy-plane)
 
-    cmpₑₜ = SInt{2}(1,2)  # transverse E-field (x- and y-components)
-    cmpₘₜ = SInt{2}(1,2)  # transverse H-field (x- and y-components)
+    cmpₑₜ = SInt(1,2)  # transverse E-field (x- and y-components)
+    cmpₘₜ = SInt(1,2)  # transverse H-field (x- and y-components)
 
-    cmpₑₗ = SInt{1}(3)  # longitudinal E-field (z-component)
-    cmpₘₗ = SInt{1}(3)  # longitudinal H-field (z-component)
+    cmpₑₗ = SInt(3)  # longitudinal E-field (z-component)
+    cmpₘₗ = SInt(3)  # longitudinal H-field (z-component)
 
     iseₜ˔shp = false
     ishₜ˔shp = false

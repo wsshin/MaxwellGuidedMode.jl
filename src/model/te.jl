@@ -13,13 +13,13 @@ const ModelTE{AK₊₂} = Model{1,1,2, 1,1, 0,1, 1, 3,AK₊₂}
 function ModelTE(grid::Grid; Atype::Type=Array)
     ft_eq = EE
 
-    cmpₛ = SInt{1}(1)  # shapes in transverse dimension (x-axis)
+    cmpₛ = SInt(1)  # shapes in transverse dimension (x-axis)
 
-    cmpₑₜ = SInt{1}(2)  # transverse E-field (y-component)
-    cmpₘₜ = SInt{1}(1)  # transverse H-field (x-component)
+    cmpₑₜ = SInt(2)  # transverse E-field (y-component)
+    cmpₘₜ = SInt(1)  # transverse H-field (x-component)
 
-    cmpₑₗ = SInt{0}()  # longitudinal E-field (no component)
-    cmpₘₗ = SInt{1}(3)  # longitudinal H-field (z-component)
+    cmpₑₗ = SInt()  # longitudinal E-field (no component)
+    cmpₘₗ = SInt(3)  # longitudinal H-field (z-component)
 
     iseₜ˔shp = true
     ishₜ˔shp = false
