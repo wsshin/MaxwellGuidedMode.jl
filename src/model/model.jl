@@ -67,12 +67,13 @@ set_boundft!(mdl::Model{K}, boundft::AbsVec{FieldType}) where {K} = (mdl.boundft
 set_Npml!(mdl::Model{K}, Npml::Tuple2{AbsVecInteger}) where {K} = (mdl.Npml = SVec{K}.(Npml); nothing)
 set_kbloch!(mdl::Model{K}, kbloch::AbsVecReal) where {K} = (mdl.kbloch = SVec{K}(kbloch); nothing)
 
-create_e⁻ⁱᵏᴸ(mdl::Model) = exp.(-im .* mdl.kbloch .* mdl.grid.L)
+create_e⁻ⁱᵏᴸ(mdl::Model{K}) where {K} = iszero(mdl.kbloch) ? ones(SFloat{K}) :
+                                                             exp.(-im .* mdl.kbloch .* mdl.grid.L)
 
 # Main functions
 function clear_objs!(mdl::Model)
     @unpack εₜarr, μₜarr, εₗarr, μₗarr, oind2shp, oind2εind, oind2μind, εind2ε, μind2μ = mdl
-    
+
     εₜarr .= 0
     μₜarr .= 0
 
