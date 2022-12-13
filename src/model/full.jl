@@ -1,12 +1,12 @@
-# Alias of Model{K,Kₑ,Kₘ, Kₑₜ,Kₘₜ, Kₑₗ,Kₘₗ, K², K₊₂,AK₊₂} for the waveguide mode
+# Alias of Model{P, K,Kₑ,Kₘ, Kₑₜ,Kₘₜ, Kₑₗ,Kₘₗ, K², K₊₂,AP} for the waveguide mode
 # equations for full 2D cross section.
 #
-# The type parameters AK₊₁ and AK₊₂ specify device-specific arrays types (e.g., CuArray) and
+# The type parameter AP specifies device-specific arrays types (e.g., CuArray) and
 # are user-defined in the constructor.
-const ModelFull{AK₊₂} = Model{2,3,3, 2,2, 1,1, 4, 4,AK₊₂}
+const ModelFull{P,AP} = Model{P, 2,3,3, 2,2, 1,1, 4, 4,AP}
 
 # Convenience constructor
-function ModelFull(grid::Grid; Atype::Type=Array)
+function ModelFull(grid::Grid; APtype::Type=Array{ComplexF,4})
     ft_eq = EE
 
     cmpₛ = SInt(1,2)  # shapes in transverse dimension (xy-plane)
@@ -20,7 +20,7 @@ function ModelFull(grid::Grid; Atype::Type=Array)
     iseₜ˔shp = false
     ishₜ˔shp = false
 
-    return ModelFull{Atype{ComplexF,4}}(;ft_eq, grid, cmpₛ, cmpₑₜ, cmpₘₜ, cmpₑₗ, cmpₘₗ, iseₜ˔shp, ishₜ˔shp)
+    return ModelFull{eltype(APtype),APtype}(;ft_eq, grid, cmpₛ, cmpₑₜ, cmpₘₜ, cmpₑₗ, cmpₘₗ, iseₜ˔shp, ishₜ˔shp)
 end
 
 # Assign the material parameters on the grid and smooth them.

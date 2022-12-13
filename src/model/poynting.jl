@@ -62,8 +62,8 @@ end
 # Calculate the power along the longitudinal direction.
 function powerₗ(E::NTuple{Kₑ,AbsArrNumber{K}},
                 H::NTuple{Kₘ,AbsArrNumber{K}},
-                mdl::Model{K,Kₑ,Kₘ}
-                ) where {K,Kₑ,Kₘ}
+                mdl::Model{P,K,Kₑ,Kₘ}
+                ) where {P,K,Kₑ,Kₘ}
     S = poynting(E, H, mdl)
     Sz = S[end]
 
@@ -78,8 +78,8 @@ end
 
 function LinearAlgebra.normalize!(E::NTuple{Kₑ,AbsArrNumber{K}},
                                   H::NTuple{Kₘ,AbsArrNumber{K}},
-                                  mdl::Model{K,Kₑ,Kₘ}
-                                  ) where {K,Kₑ,Kₘ}
+                                  mdl::Model{P,K,Kₑ,Kₘ}
+                                  ) where {P,K,Kₑ,Kₘ}
     Pz = powerₗ(E, H, mdl)
     sqrtPz = √Pz
 
