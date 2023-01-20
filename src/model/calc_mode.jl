@@ -174,7 +174,7 @@ function calc_mode(mdl::Model, ω::Real, βguess::Number;
 
     ft_eq = mdl.ft_eq
     A = create_A(ft_eq, ω, Ps, ∇̽s, πcmps)
-    @show eltype(A)<:Real
+    # @show eltype(A)<:Real
 
     β², f = eigs(A, nev=nmode, sigma=βguess^2)
     eltype(A)<:Real && (β² = real(β²))

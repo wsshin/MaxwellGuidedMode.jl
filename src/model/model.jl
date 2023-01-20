@@ -36,11 +36,11 @@ export complete_fields
     μₗarr::AP = create_param_array(P, grid.N, ncmp=Kₘ-Kₘₜ)  # filled with zeros
 
     # Temporary storages for assignment and smoothing of material parameters
-    oind2shp::Vector{Shape{K,K²}} = Shape{K,K²}[]
-    oind2εind::Vector{ParamInd} = ParamInd[]
-    oind2μind::Vector{ParamInd} = ParamInd[]
-    εind2ε::Vector{S²Mat3{P}} = S²Mat3{P}[]
-    μind2μ::Vector{S²Mat3{P}} = S²Mat3{P}[]
+    shp4oind::Vector{Shape{K,K²}} = Shape{K,K²}[]
+    εind4oind::Vector{ParamInd} = ParamInd[]
+    μind4oind::Vector{ParamInd} = ParamInd[]
+    ε4εind::Vector{S²Mat3{P}} = S²Mat3{P}[]
+    μ4μind::Vector{S²Mat3{P}} = S²Mat3{P}[]
 
     # Boolean flags indicating if the transverse E- and H-field dimensions are orthogonal to
     # the shape dimensions.  Used for material parameter smoothing in calc_matparams!().
@@ -72,7 +72,7 @@ create_e⁻ⁱᵏᴸ(mdl::Model{K}) where {K} = iszero(mdl.kbloch) ? ones(SFloat
 
 # Main functions
 function clear_objs!(mdl::Model)
-    @unpack εₜarr, μₜarr, εₗarr, μₗarr, oind2shp, oind2εind, oind2μind, εind2ε, μind2μ = mdl
+    @unpack εₜarr, μₜarr, εₗarr, μₗarr, shp4oind, εind4oind, μind4oind, ε4εind, μ4μind = mdl
 
     εₜarr .= 0
     μₜarr .= 0
@@ -80,11 +80,11 @@ function clear_objs!(mdl::Model)
     εₗarr .= 0
     μₗarr .= 0
 
-    empty!(oind2shp)
-    empty!(oind2εind)
-    empty!(oind2μind)
-    empty!(εind2ε)
-    empty!(μind2μ)
+    empty!(shp4oind)
+    empty!(εind4oind)
+    empty!(μind4oind)
+    empty!(ε4εind)
+    empty!(μ4μind)
 
     return nothing
 end
@@ -99,10 +99,10 @@ function MaxwellBase.add_obj!(mdl::Model{K}, matname::String, shapes::Shape{K}..
     @argcheck isbidirectional(EE, mat, mdl)  # ε should not couple transverse and longitudinal fields
     @argcheck isbidirectional(HH, mat, mdl)  # μ should not couple transverse and longitudinal fields
 
-    @unpack oind2shp, oind2εind, oind2μind, εind2ε, μind2μ = mdl
+    @unpack shp4oind, εind4oind, μind4oind, ε4εind, μ4μind = mdl
     for shp = shapes  # shapes is tuple
         obj = Object(shp, mat)
-        add_obj!(oind2shp, (oind2εind,oind2μind), (εind2ε,μind2μ), obj)
+        add_obj!(shp4oind, (εind4oind,μind4oind), (ε4εind,μ4μind), obj)
     end
 
     return nothing

@@ -32,7 +32,7 @@ function calc_matparams!(mdl::ModelTE)
     # Take necessary fields of mdl.
     @unpack grid, boundft,
             εₜarr, µₜarr, µₗarr,
-            oind2shp, oind2εind, oind2μind, εind2ε, μind2μ,
+            shp4oind, εind4oind, μind4oind, ε4εind, μ4μind,
             cmpₑₜ, cmpₘₜ, cmpₘₗ,
             iseₜ˔shp, ishₜ˔shp = mdl
 
@@ -42,40 +42,40 @@ function calc_matparams!(mdl::ModelTE)
     gtₑ = ft2gt.(EE,boundft)
     gtₘ = ft2gt.(HH,boundft)
 
-    εind2εₜ = sub_pind2matprm(εind2ε, cmpₑₜ)
-    μind2μₜ = sub_pind2matprm(μind2μ, cmpₘₜ)
-    μind2μₗ = sub_pind2matprm(μind2μ, cmpₘₗ)
+    εₜ4εind = sub_matprm4pind(ε4εind, cmpₑₜ)
+    μₜ4μind = sub_matprm4pind(μ4μind, cmpₘₜ)
+    μₗ4μind = sub_matprm4pind(μ4μind, cmpₘₗ)
 
     ishₗ˔shp = true
 
     # Create temporary storages.
     # Because Ey and Hx are at the same locations, smoothing them can use the same object
     # index.
-    pₜ_oind2d = create_oind_array(N)  # for εₜ (= εyy) and μₜ (= μxx)
-    pₗ_oind2d = create_oind_array(N)  # for μₗ (= μzz)
-    pₗ_oind2d′ = create_oind_array(N)  # for @assert below
+    oind2d_pₜ = create_oind_array(N)  # for εₜ (= εyy) and μₜ (= μxx)
+    oind2d_pₗ = create_oind_array(N)  # for μₗ (= μzz)
+    oind2d′_pₗ = create_oind_array(N)  # for @assert below
 
     # Assign the material parameters.
     # Note that μₜarr uses gtₑ rather than gtₘ, because it is rank-0 tensor and its locations
     # are the E-field locations; see the definition MaxwellBase/assign_param!().
     # (See the figure in L10 - Eigenmode Analysis > 1.3 Waveguide mode analysis > Matrix
     # equation formulation; take the cross section through Ey, Hx, Hz.)
-    assign_param!(εₜarr, tuple(pₗ_oind2d), oind2shp, oind2εind, εind2εₜ, gtₑ, τlg, isbloch)  # εₜ tensors (rank-0, so scalars)
-    assign_param!(µₜarr, tuple(pₗ_oind2d′), oind2shp, oind2μind, μind2μₜ, gtₑ, τlg, isbloch)  # μₜ tensors (rank-0, so scalars)
-    assign_param!(µₗarr, tuple(pₜ_oind2d), oind2shp, oind2μind, μind2μₗ, gtₘ, τlg, isbloch)  # μₗ tensors (rank-0, so scalars)
+    assign_param!(εₜarr, tuple(oind2d_pₗ), shp4oind, εind4oind, εₜ4εind, gtₑ, τlg, isbloch)  # εₜ tensors (rank-0, so scalars)
+    assign_param!(µₜarr, tuple(oind2d′_pₗ), shp4oind, μind4oind, μₜ4μind, gtₑ, τlg, isbloch)  # μₜ tensors (rank-0, so scalars)
+    assign_param!(µₗarr, tuple(oind2d_pₜ), shp4oind, μind4oind, μₗ4μind, gtₘ, τlg, isbloch)  # μₗ tensors (rank-0, so scalars)
 
-    # Some temporary arrays should be identical.  Specifically, εyy_oind2d and μxx_oind2d
+    # Some temporary arrays should be identical.  Specifically, oind2d_εyy and oind2d_μxx
     # are evaluated at the locations surrounding the εyy and μxx locations, which are the
     # same locations.  (See the figure in L10 - Eigenmode Analysis > 1.3 Waveguide mode
     # analysis > Matrix equation formulation; take the cross section through Ey, Hx, Hz.)
-    # Therefore, εyy_oind2d and μxx_oind2d are evaluated at the same locations, so they
+    # Therefore, oind2d_εyy and oind2d_μxx are evaluated at the same locations, so they
     # should be the same object indices.
-    @assert isequal(pₗ_oind2d′, pₗ_oind2d)
+    @assert isequal(oind2d′_pₗ, oind2d_pₗ)
 
     # Smooth the material parameters.
-    smooth_param!(εₜarr, tuple(pₜ_oind2d), oind2shp, oind2εind, εind2εₜ, gtₑ, l, lg, σ, ∆τ, iseₜ˔shp)  # εₜ tensors (rank-0, so scalars)
-    smooth_param!(µₜarr, tuple(pₜ_oind2d), oind2shp, oind2μind, μind2μₜ, gtₑ, l, lg, σ, ∆τ, ishₜ˔shp)  # μₜ tensors (rank-0, so scalars)
-    smooth_param!(µₗarr, tuple(pₗ_oind2d), oind2shp, oind2μind, μind2μₗ, gtₘ, l, lg, σ, ∆τ, ishₗ˔shp)  # μₗ tensors (rank-0, so scalars)
+    smooth_param!(εₜarr, tuple(oind2d_pₜ), shp4oind, εind4oind, εₜ4εind, gtₑ, l, lg, σ, ∆τ, iseₜ˔shp)  # εₜ tensors (rank-0, so scalars)
+    smooth_param!(µₜarr, tuple(oind2d_pₜ), shp4oind, μind4oind, μₜ4μind, gtₑ, l, lg, σ, ∆τ, ishₜ˔shp)  # μₜ tensors (rank-0, so scalars)
+    smooth_param!(µₗarr, tuple(oind2d_pₗ), shp4oind, μind4oind, μₗ4μind, gtₘ, l, lg, σ, ∆τ, ishₗ˔shp)  # μₗ tensors (rank-0, so scalars)
 
     return nothing
 end

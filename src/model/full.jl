@@ -28,7 +28,7 @@ function calc_matparams!(mdl::ModelFull)
     # Take necessary fields of mdl.
     @unpack grid, boundft,
             εₜarr, µₜarr, εₗarr, µₗarr,
-            oind2shp, oind2εind, oind2μind, εind2ε, μind2μ,
+            shp4oind, εind4oind, μind4oind, ε4εind, μ4μind,
             cmpₑₜ, cmpₘₜ, cmpₑₗ, cmpₘₗ,
             iseₜ˔shp, ishₜ˔shp = mdl
 
@@ -38,54 +38,54 @@ function calc_matparams!(mdl::ModelFull)
     gtₑ = ft2gt.(EE,boundft)
     gtₘ = ft2gt.(HH,boundft)
 
-    εind2εₜ = sub_pind2matprm(εind2ε, cmpₑₜ)
-    εind2εₗ = sub_pind2matprm(εind2ε, cmpₑₗ)
-    μind2μₜ = sub_pind2matprm(μind2μ, cmpₘₜ)
-    μind2μₗ = sub_pind2matprm(μind2μ, cmpₘₗ)
+    εₜ4εind = sub_matprm4pind(ε4εind, cmpₑₜ)
+    εₗ4εind = sub_matprm4pind(ε4εind, cmpₑₗ)
+    μₜ4μind = sub_matprm4pind(μ4μind, cmpₘₜ)
+    μₗ4μind = sub_matprm4pind(μ4μind, cmpₘₗ)
 
     iseₗ˔shp = true
     ishₗ˔shp = true
 
     # Create temporary storages.
-    εxx_oind2d = create_oind_array(N)
-    εyy_oind2d = create_oind_array(N)
-    εzz_oind2d = create_oind_array(N)
-    εoo_oind2d = create_oind_array(N)
+    oind2d_εxx = create_oind_array(N)
+    oind2d_εyy = create_oind_array(N)
+    oind2d_εzz = create_oind_array(N)
+    oind2d_εoo = create_oind_array(N)
 
-    μxx_oind2d = create_oind_array(N)
-    μyy_oind2d = create_oind_array(N)
-    μzz_oind2d = create_oind_array(N)
-    μoo_oind2d = create_oind_array(N)
+    oind2d_μxx = create_oind_array(N)
+    oind2d_μyy = create_oind_array(N)
+    oind2d_μzz = create_oind_array(N)
+    oind2d_μoo = create_oind_array(N)
 
     # Assign the material parameters.
     # (See the figure in L10 - Eigenmode Analysis > 1.3 Waveguide mode analysis > Matrix
     # equation formulation.)
-    assign_param!(εₜarr, (εyy_oind2d,εxx_oind2d), oind2shp, oind2εind, εind2εₜ, gtₑ, τlg, isbloch)  # diagonal entries of εₜ tensors
-    assign_param!(εₜarr, tuple(μzz_oind2d), oind2shp, oind2εind, εind2εₜ, gtₑ, τlg, isbloch)  # off-diagonal entries of εₜ tensors
-    assign_param!(µₗarr, tuple(εoo_oind2d), oind2shp, oind2μind, μind2μₗ, gtₘ, τlg, isbloch)  # μₗ tensors (rank-0, so scalars)
+    assign_param!(εₜarr, (oind2d_εyy,oind2d_εxx), shp4oind, εind4oind, εₜ4εind, gtₑ, τlg, isbloch)  # diagonal entries of εₜ tensors
+    assign_param!(εₜarr, tuple(oind2d_μzz), shp4oind, εind4oind, εₜ4εind, gtₑ, τlg, isbloch)  # off-diagonal entries of εₜ tensors
+    assign_param!(µₗarr, tuple(oind2d_εoo), shp4oind, μind4oind, μₗ4μind, gtₘ, τlg, isbloch)  # μₗ tensors (rank-0, so scalars)
 
-    assign_param!(µₜarr, (μyy_oind2d,μxx_oind2d), oind2shp, oind2μind, μind2μₜ, gtₘ, τlg, isbloch)  # diagonal entries of μₜ tensors
-    assign_param!(µₜarr, tuple(εzz_oind2d), oind2shp, oind2μind, μind2μₜ, gtₘ, τlg, isbloch)  # off-diagonal entries of μₜ tensors
-    assign_param!(εₗarr, tuple(μoo_oind2d), oind2shp, oind2εind, εind2εₗ, gtₑ, τlg, isbloch)  # εₗ tensors (rank-0, so scalars)
+    assign_param!(µₜarr, (oind2d_μyy,oind2d_μxx), shp4oind, μind4oind, μₜ4μind, gtₘ, τlg, isbloch)  # diagonal entries of μₜ tensors
+    assign_param!(µₜarr, tuple(oind2d_εzz), shp4oind, μind4oind, μₜ4μind, gtₘ, τlg, isbloch)  # off-diagonal entries of μₜ tensors
+    assign_param!(εₗarr, tuple(oind2d_μoo), shp4oind, εind4oind, εₗ4εind, gtₑ, τlg, isbloch)  # εₗ tensors (rank-0, so scalars)
 
-    # Some temporary arrays should be identical.  For example, εyy_oind2d and μxx_oind2d are
+    # Some temporary arrays should be identical.  For example, oind2d_εyy and oind2d_μxx are
     # evaluated at the locations surrounding the εyy and μxx locations, which are the same
     # locations.  (See the figure in L10 - Eigenmode Analysis > 1.3 Waveguide mode analysis
-    # > Matrix equation formulation.)  Therefore, εyy_oind2d and μxx_oind2d are evaluated at
+    # > Matrix equation formulation.)  Therefore, oind2d_εyy and oind2d_μxx are evaluated at
     # the same locations, so they should be the same object indices.
-    @assert isequal(εxx_oind2d, μyy_oind2d)
-    @assert isequal(εyy_oind2d, μxx_oind2d)
-    @assert isequal(εoo_oind2d, εzz_oind2d)
-    @assert isequal(μoo_oind2d, μzz_oind2d)
+    @assert isequal(oind2d_εxx, oind2d_μyy)
+    @assert isequal(oind2d_εyy, oind2d_μxx)
+    @assert isequal(oind2d_εoo, oind2d_εzz)
+    @assert isequal(oind2d_μoo, oind2d_μzz)
 
     # Smooth the material parameters.
-    smooth_param!(εₜarr, (εxx_oind2d,εyy_oind2d), oind2shp, oind2εind, εind2εₜ, gtₑ, l, lg, σ, ∆τ, iseₜ˔shp)  # diagonal entries of εₜ tensors
-    smooth_param!(εₜarr, tuple(εoo_oind2d), oind2shp, oind2εind, εind2εₜ, gtₑ, l, lg, σ, ∆τ, iseₜ˔shp)  # off-diagonal entries of εₜ tensors
-    smooth_param!(µₗarr, tuple(μzz_oind2d), oind2shp, oind2μind, μind2μₗ, gtₘ, l, lg, σ, ∆τ, ishₗ˔shp)  # μₗ tensors (rank-0, so scalars)
+    smooth_param!(εₜarr, (oind2d_εxx,oind2d_εyy), shp4oind, εind4oind, εₜ4εind, gtₑ, l, lg, σ, ∆τ, iseₜ˔shp)  # diagonal entries of εₜ tensors
+    smooth_param!(εₜarr, tuple(oind2d_εoo), shp4oind, εind4oind, εₜ4εind, gtₑ, l, lg, σ, ∆τ, iseₜ˔shp)  # off-diagonal entries of εₜ tensors
+    smooth_param!(µₗarr, tuple(oind2d_μzz), shp4oind, μind4oind, μₗ4μind, gtₘ, l, lg, σ, ∆τ, ishₗ˔shp)  # μₗ tensors (rank-0, so scalars)
 
-    smooth_param!(µₜarr, (μxx_oind2d,μyy_oind2d), oind2shp, oind2μind, μind2μₜ, gtₘ, l, lg, σ, ∆τ, ishₜ˔shp)  # diagonal entries of μₜ tensors
-    smooth_param!(µₜarr, tuple(μoo_oind2d), oind2shp, oind2μind, μind2μₜ, gtₘ, l, lg, σ, ∆τ, ishₜ˔shp)  # off-diagonal entries of μₜ tensors
-    smooth_param!(εₗarr, tuple(εzz_oind2d), oind2shp, oind2εind, εind2εₗ, gtₑ, l, lg, σ, ∆τ, iseₗ˔shp)  # εₗ tensors (rank-0, so scalars)
+    smooth_param!(µₜarr, (oind2d_μxx,oind2d_μyy), shp4oind, μind4oind, μₜ4μind, gtₘ, l, lg, σ, ∆τ, ishₜ˔shp)  # diagonal entries of μₜ tensors
+    smooth_param!(µₜarr, tuple(oind2d_μoo), shp4oind, μind4oind, μₜ4μind, gtₘ, l, lg, σ, ∆τ, ishₜ˔shp)  # off-diagonal entries of μₜ tensors
+    smooth_param!(εₗarr, tuple(oind2d_εzz), shp4oind, εind4oind, εₗ4εind, gtₑ, l, lg, σ, ∆τ, iseₗ˔shp)  # εₗ tensors (rank-0, so scalars)
 
     return nothing
 end
