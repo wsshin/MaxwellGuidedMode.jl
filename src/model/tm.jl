@@ -1,4 +1,4 @@
-# Alias of Model{P, K,Kₑ,Kₘ, Kₑₜ,Kₘₜ, Kₑₗ,Kₘₗ, K², K₊₂,AP} for the TM waveguide mode
+# Alias of Model{K,Kₑ,Kₘ, Kₑₜ,Kₘₜ, Kₑₗ,Kₘₗ, K²,K₊₂, P,AP} for the TM waveguide mode
 # mode equations for 1D cross section.
 #
 # The type parameter AP specifies device-specific arrays types (e.g., CuArray) and is
@@ -7,7 +7,7 @@
 # Note that the TM mode has (Ex, Ez, Hy) as nonzero components; this is unlike TM Maxwell's
 # equations that have two H-field components and one E-field component.
 
-const ModelTM{P,AP} = Model{P, 1,2,1, 1,1, 1,0, 1, 3,AP}
+const ModelTM{P,AP} = Model{1,2,1, 1,1, 1,0, 1,3, P,AP}
 
 # Convenience constructor
 function ModelTM(grid::Grid; APtype::Type=Array{ComplexF,3})
@@ -24,7 +24,7 @@ function ModelTM(grid::Grid; APtype::Type=Array{ComplexF,3})
     iseₜ˔shp = false
     ishₜ˔shp = true
 
-    return ModelTM{eltype(APtype),APtype}(;ft_eq, grid, cmpₛ, cmpₑₜ, cmpₘₜ, cmpₑₗ, cmpₘₗ, iseₜ˔shp, ishₜ˔shp)
+    return ModelTM{eltype(APtype),APtype}(; ft_eq, grid, cmpₛ, cmpₑₜ, cmpₘₜ, cmpₑₗ, cmpₘₗ, iseₜ˔shp, ishₜ˔shp)
 end
 
 # Assign the material parameters on the grid and smooth them.

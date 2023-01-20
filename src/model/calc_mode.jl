@@ -21,7 +21,7 @@ function create_stretched_∆ls(mdl::Model)
     return (s∆lₑ, s∆lₘ), (s∆lₑ⁻¹, s∆lₘ⁻¹)
 end
 
-function create_paramops(mdl::Model{P,K,Kₑ,Kₘ,Kₑₜ,Kₘₜ}) where {P,K,Kₑ,Kₘ,Kₑₜ,Kₘₜ}
+function create_paramops(mdl::Model{K,Kₑ,Kₘ,Kₑₜ,Kₘₜ}) where {K,Kₑ,Kₘ,Kₑₜ,Kₘₜ}
     (s∆lₑ, s∆lₘ), (s∆lₑ⁻¹, s∆lₘ⁻¹) = create_stretched_∆ls(mdl)
     calc_matparams!(mdl)  # assignment and smoothing; implemented for each specialized alias of Model
 
@@ -68,7 +68,7 @@ function create_curls(mdl::Model)
     return (∇̽ₑₜ,∇̽ₘₜ), (∇̽ₑₗ,∇̽ₘₗ)
 end
 
-function create_πcmps(mdl::Model{P,K}) where {P,K}
+function create_πcmps(mdl::Model{K}) where {K}
     @unpack grid, cmpₑₜ, cmpₘₜ, order_cmpfirst = mdl
 
     permute = reverse(SVec(ntuple(identity, Val(K))))
@@ -174,9 +174,10 @@ function calc_mode(mdl::Model, ω::Real, βguess::Number;
 
     ft_eq = mdl.ft_eq
     A = create_A(ft_eq, ω, Ps, ∇̽s, πcmps)
+    @show eltype(A)<:Real
 
     β², f = eigs(A, nev=nmode, sigma=βguess^2)
-    isreal(A)  && (β² = real(β²))
+    eltype(A)<:Real && (β² = real(β²))
 
     fₜ = f[:,nmode]
     β = .√β²[nmode]

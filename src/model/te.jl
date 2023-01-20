@@ -1,4 +1,4 @@
-# Alias of Model{P, K,Kₑ,Kₘ, Kₑₜ,Kₘₜ, Kₑₗ,Kₘₗ, K², K₊₂,AP} for the TE waveguide mode
+# Alias of Model{K,Kₑ,Kₘ, Kₑₜ,Kₘₜ, Kₑₗ,Kₘₗ, K²,K₊₂, P,AP} for the TE waveguide mode
 # mode equations for 1D cross section.
 #
 # The type parameter AP specifies device-specific arrays types (e.g., CuArray) and is
@@ -7,7 +7,7 @@
 # Note that the TE mode has (Ey, Hx, Hz) as nonzero components; this is unlike TE Maxwell's
 # equations that have two E-field components and one H-field component.
 
-const ModelTE{P,AP} = Model{P, 1,1,2, 1,1, 0,1, 1, 3,AP}
+const ModelTE{P,AP} = Model{1,1,2, 1,1, 0,1, 1,3, P,AP}
 
 # Convenience constructor
 function ModelTE(grid::Grid; APtype::Type=Array{ComplexF,3})
@@ -24,7 +24,7 @@ function ModelTE(grid::Grid; APtype::Type=Array{ComplexF,3})
     iseₜ˔shp = true
     ishₜ˔shp = false
 
-    return ModelTE{eltype(APtype),APtype}(;ft_eq, grid, cmpₛ, cmpₑₜ, cmpₘₜ, cmpₑₗ, cmpₘₗ, iseₜ˔shp, ishₜ˔shp)
+    return ModelTE{eltype(APtype),APtype}(; ft_eq, grid, cmpₛ, cmpₑₜ, cmpₘₜ, cmpₑₗ, cmpₘₗ, iseₜ˔shp, ishₜ˔shp)
 end
 
 # Assign the material parameters on the grid and smooth them.

@@ -8,7 +8,7 @@ struct ParametrizedMode{K,Kₑ,Kₘ,Kθ,Kθₛ,NT<:NamedTuple}
     H::NTuple{Kₘ,ArrComplexF{Kθₛ}}  # H(θ)
 end
 
-function ParametrizedMode(θ::NamedTuple, mdl::Model{P,K,Kₑ,Kₘ}) where {P,K,Kₑ,Kₘ}
+function ParametrizedMode(θ::NamedTuple, mdl::Model{K,Kₑ,Kₘ}) where {K,Kₑ,Kₘ}
     @argcheck haskey(θ, :ω)  # θ should have entry named ω
     @argcheck all(issorted.(values(θ)))  # each entry of θ should be sorted in ascending order for interpolation
 
@@ -29,10 +29,10 @@ Base.length(pm::ParametrizedMode) = length(pm.θ.ω)
 
 function scan_param!(pm::ParametrizedMode{K,Kₑ,Kₘ,Kθ},
                      βguessₑ::Number,  # guess β for ending parameters (e.g., largest ω = shortest λ) in pm
-                     mdl::Model{P,K,Kₑ,Kₘ};
+                     mdl::Model{K,Kₑ,Kₘ};
                      update_model!::Any=(mdl,θ)->nothing,  # default: do not update model
                      nmode::Int=1  # mode number
-                     ) where {P,K,Kₑ,Kₘ,Kθ}
+                     ) where {K,Kₑ,Kₘ,Kθ}
     println("Begin parameter scan.")
 
     θ = pm.θ

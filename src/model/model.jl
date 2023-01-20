@@ -5,11 +5,10 @@ export complete_fields
 
 # Do not export Model; qualify it with the package name MaxwellFDFD, because I would have
 # similar types in other packages such as MaxwellSALT and MaxwellGuide.
-@with_kw mutable struct Model{P<:Number,  # material parameter tensor's element type
-                              K,Kₑ,Kₘ,
+@with_kw mutable struct Model{K,Kₑ,Kₘ,
                               Kₑₜ,Kₘₜ,Kₑₗ,Kₘₗ,
-                              K²,
-                              K₊₂,AP<:AbsArr{P,K₊₂}}
+                              K²,K₊₂,
+                              P<:Number,AP<:AbsArr{P,K₊₂}}  # P: material parameter tensor's element type
     # Frequency
     ωpml::Number = 0.0  # can be complex
 
@@ -52,7 +51,7 @@ export complete_fields
     order_cmpfirst::Bool = true
 end
 
-function Base.size(mdl::Model{P,K,Kₑ,Kₘ,Kₑₜ,Kₘₜ}, ft::FieldType) where {P,K,Kₑ,Kₘ,Kₑₜ,Kₘₜ}
+function Base.size(mdl::Model{K,Kₑ,Kₘ,Kₑₜ,Kₘₜ}, ft::FieldType) where {K,Kₑ,Kₘ,Kₑₜ,Kₘₜ}
     Kf = ft==EE ? Kₑₜ : Kₘₜ
     sz_grid = size(mdl.grid)
     sz = mdl.order_cmpfirst ? (Kf, sz_grid...) : (sz_grid..., Kf)
@@ -64,11 +63,11 @@ Base.length(mdl::Model, ft::FieldType) = prod(size(mdl, ft))
 
 # Basic setters
 set_ωpml!(mdl::Model, ωpml::Number) = (mdl.ωpml = ωpml; nothing)
-set_boundft!(mdl::Model{P,K}, boundft::AbsVec{FieldType}) where {P,K} = (mdl.boundft = SVec{K}(boundft); nothing)
-set_Npml!(mdl::Model{P,K}, Npml::Tuple2{AbsVecInteger}) where {P,K} = (mdl.Npml = SVec{K}.(Npml); nothing)
-set_kbloch!(mdl::Model{P,K}, kbloch::AbsVecReal) where {P,K} = (mdl.kbloch = SVec{K}(kbloch); nothing)
+set_boundft!(mdl::Model{K}, boundft::AbsVec{FieldType}) where {K} = (mdl.boundft = SVec{K}(boundft); nothing)
+set_Npml!(mdl::Model{K}, Npml::Tuple2{AbsVecInteger}) where {K} = (mdl.Npml = SVec{K}.(Npml); nothing)
+set_kbloch!(mdl::Model{K}, kbloch::AbsVecReal) where {K} = (mdl.kbloch = SVec{K}(kbloch); nothing)
 
-create_e⁻ⁱᵏᴸ(mdl::Model{P,K}) where {P,K} = iszero(mdl.kbloch) ? ones(SFloat{K}) :
+create_e⁻ⁱᵏᴸ(mdl::Model{K}) where {K} = iszero(mdl.kbloch) ? ones(SFloat{K}) :
                                                              exp.(-im .* mdl.kbloch .* mdl.grid.L)
 
 # Main functions
@@ -90,12 +89,12 @@ function clear_objs!(mdl::Model)
     return nothing
 end
 
-MaxwellBase.add_obj!(mdl::Model{P,K}, matname::String, shapes::AbsVec{<:Shape{K}};
-                     ε::AbsMatParam=1.0, μ::AbsMatParam=1.0) where {P,K} =
+MaxwellBase.add_obj!(mdl::Model{K}, matname::String, shapes::AbsVec{<:Shape{K}};
+                     ε::AbsMatParam=1.0, μ::AbsMatParam=1.0) where {K} =
     add_obj!(mdl, matname, ε=ε, μ=μ, tuple(shapes...))
 
-function MaxwellBase.add_obj!(mdl::Model{P,K}, matname::String, shapes::Shape{K}...;
-                              ε::AbsMatParam=1.0, μ::AbsMatParam=1.0) where {P,K}
+function MaxwellBase.add_obj!(mdl::Model{K}, matname::String, shapes::Shape{K}...;
+                              ε::AbsMatParam=1.0, μ::AbsMatParam=1.0) where {K}
     mat = Material(matname, ε=ε, μ=μ)
     @argcheck isbidirectional(EE, mat, mdl)  # ε should not couple transverse and longitudinal fields
     @argcheck isbidirectional(HH, mat, mdl)  # μ should not couple transverse and longitudinal fields
@@ -128,8 +127,8 @@ function calc_matparams! end
 function complete_fields end
 
 function field2vec(E::NTuple{Kₑ,AbsVecNumber{K}}, H::NTuple{Kₘ,AbsVecNumber{K}},
-                   mdl::Model{P,K,Kₑ,Kₘ}
-                   ) where {P,K,Kₑ,Kₘ}
+                   mdl::Model{K,Kₑ,Kₘ}
+                   ) where {K,Kₑ,Kₘ}
     @unpack ft_eq, cmpₑₜ, cmpₘₜ, order_cmpfirst = mdl
 
     U = ft_eq==EE ? E : H
