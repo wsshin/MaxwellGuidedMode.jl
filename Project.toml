@@ -18,7 +18,7 @@ SimpleConstants = "6ca440b6-64d6-4b6c-88af-e5d091cb43b1"
 VoxelwiseConstantMapping = "30c4ba4d-5c6d-4df8-9a6f-7ded98721337"
 
 [compat]
-AbbreviatedTypes = "0.3.3 - 0.9"
+AbbreviatedTypes = "0.3.4 - 0.9"
 ArgCheck = "2.1.0 - 2"
 Arpack = "0.5.3 - 0.9"
 Dierckx = "0.5.1 - 0.9"
