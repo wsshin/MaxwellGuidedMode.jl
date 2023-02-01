@@ -48,13 +48,13 @@ export complete_fields
     ishₜ˔shp::Bool
 
     # Indexing scheme for DOFs
-    order_cmpfirst::Bool = true
+    cmpfirst::Bool = true
 end
 
 function Base.size(mdl::Model{K,Kₑ,Kₘ,Kₑₜ,Kₘₜ}, ft::FieldType) where {K,Kₑ,Kₘ,Kₑₜ,Kₘₜ}
     Kf = ft==EE ? Kₑₜ : Kₘₜ
     sz_grid = size(mdl.grid)
-    sz = mdl.order_cmpfirst ? (Kf, sz_grid...) : (sz_grid..., Kf)
+    sz = mdl.cmpfirst ? (Kf, sz_grid...) : (sz_grid..., Kf)
 
     return sz
 end
@@ -129,17 +129,17 @@ function complete_fields end
 function field2vec(E::NTuple{Kₑ,AbsVecNumber{K}}, H::NTuple{Kₘ,AbsVecNumber{K}},
                    mdl::Model{K,Kₑ,Kₘ}
                    ) where {K,Kₑ,Kₘ}
-    @unpack ft_eq, cmpₑₜ, cmpₘₜ, order_cmpfirst = mdl
+    @unpack ft_eq, cmpₑₜ, cmpₘₜ, cmpfirst = mdl
 
     U = ft_eq==EE ? E : H
     cmpᵤₜ = ft_eq==EE ? cmpₑₜ : cmpₘₜ
     Uₜ = cat(U[cmpᵤₜ]..., dims=K+1)
 
-    if order_cmpfirst
+    if cmpfirst
         Uₜ = permutedims(Uₜ, circshift(1:K, 1))
     end
 
-    return field_arr2vec(Uₜ; order_cmpfirst)
+    return field_arr2vec(Uₜ; cmpfirst)
 end
 
 include("poynting.jl")

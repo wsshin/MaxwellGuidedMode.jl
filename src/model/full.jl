@@ -119,8 +119,8 @@ function complete_fields(β::Number,  # propagation constant
     Fₜ = reshape(fₜ, sz)
     F′ₜ = reshape(f′ₜ, sz)
 
-    order_cmpfirst = mdl.order_cmpfirst
-    d = order_cmpfirst ? 1 : length(sz)
+    cmpfirst = mdl.cmpfirst
+    d = cmpfirst ? 1 : length(sz)
 
     Fx = selectdim(Fₜ, d, 1)
     Fy = selectdim(Fₜ, d, 2)
