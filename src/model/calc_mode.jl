@@ -179,8 +179,10 @@ function calc_mode(mdl::Model, ω::Real, βguess::Number;
     β², f = eigs(A, nev=nmode, sigma=βguess^2)
     eltype(A)<:Real && (β² = real(β²))
 
-    fₜ = f[:,nmode]
-    β = .√β²[nmode]
+    ind_mode = isempty(fₜref) ? nmode : findmax(abs.(fₜref'f)[:])[2]
+
+    fₜ = f[:,ind_mode]
+    β = .√β²[ind_mode]
 
     # See RN - NLSE > December 12, 2021
     if length(fₜref)==length(fₜ)
