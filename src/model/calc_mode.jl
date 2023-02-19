@@ -71,11 +71,11 @@ end
 function create_πcmps(mdl::Model{K}) where {K}
     @unpack grid, cmpₑₜ, cmpₘₜ, cmpfirst = mdl
 
-    permute = reverse(SVec(ntuple(identity, Val(K))))
+    cmpperm = reverse(SVec(ntuple(identity, Val(K))))
     scale₀ = SFloat(1,-1)
 
-    πcmpₑ = create_πcmp(grid.N, permute, scale=scale₀[cmpₑₜ]; cmpfirst)
-    πcmpₘ = create_πcmp(grid.N, permute, scale=scale₀[cmpₘₜ]; cmpfirst)
+    πcmpₑ = create_πcmp(grid.N, cmpperm; scale=scale₀[cmpₑₜ], cmpfirst)
+    πcmpₘ = create_πcmp(grid.N, cmpperm; scale=scale₀[cmpₘₜ], cmpfirst)
 
     return πcmpₑ, πcmpₘ
 end
