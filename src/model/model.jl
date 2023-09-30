@@ -17,6 +17,9 @@ export complete_fields
 
     # Grid
     grid::Grid{K}
+
+    # Component information used for creating generalized curls
+    # See L10 - Eigenmode Analysis > [Aug/27/2021] Attempt to recover similarity between 1D and 2D cases.
     cmpₛ::SInt{K}  # Cartesian components of shape dimension
     cmpₑₜ::SInt{Kₑₜ}  # Cartesian components of transverse E-field
     cmpₘₜ::SInt{Kₘₜ}  # Cartesian components of transverse H-field
