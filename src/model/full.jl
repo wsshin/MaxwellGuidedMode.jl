@@ -90,14 +90,16 @@ function calc_matparams!(mdl::ModelFull)
     return nothing
 end
 
-function complete_fields(β::Number,  # propagation constant
-                         fₜ::AbsVecNumber,  # calculated transverse field Fₜ as column vector
-                         ft::FieldType,  # type of input field Fₜ
-                         ω::Number,
-                         Ps::Tuple22{AbsMatNumber},
-                         ∇̽s::Tuple22{AbsMatNumber},
-                         πcmps::Tuple2{AbsMatNumber},
-                         mdl::ModelFull)
+function complete_fields(
+    β::Number,  # propagation constant
+    fₜ::AbsVecNumber,  # calculated transverse field Fₜ as column vector
+    ft::FieldType,  # type of input field Fₜ
+    ω::Number,
+    Ps::Tuple22{AbsMatNumber},
+    ∇̽s::Tuple22{AbsMatNumber},
+    πcmps::Tuple2{AbsMatNumber},
+    mdl::ModelFull
+)
     ft′ = alter(ft)
 
     # Calculate the transverse components of the complementary field.
@@ -141,9 +143,11 @@ function complete_fields(β::Number,  # propagation constant
 end
 
 # See the field configurations in L10 - Eigenmode Analysis > Matrix equation formulation.
-function poynting(E::Tuple3{AbsMatNumber},  # (Ex, Ey, Ez)
-                  H::Tuple3{AbsMatNumber},  # (Hx, Hy, Hz)
-                  mdl::ModelFull)
+function poynting(
+    E::Tuple3{AbsMatNumber},  # (Ex, Ey, Ez)
+    H::Tuple3{AbsMatNumber},  # (Hx, Hy, Hz)
+    mdl::ModelFull
+)
     boundft = mdl.boundft
     grid = mdl.grid
     isbloch = grid.isbloch

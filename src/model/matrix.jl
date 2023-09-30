@@ -87,10 +87,12 @@ create_ⅈf′ₗ4fₜ(ft, ω, Ps::Tuple22{AbsMatNumber}, ∇̽s::Tuple22{AbsMat
 
 # Create the operator that generates im * F′ₗ from Fₜ, where F′ is the field complementary
 # to F (e.g., F′ = H-field for F = E-field).
-function create_ⅈf′ₗ4fₜ(ft::FieldType,  # type of input field Fₜ, not output field F′ₗ
-                        ω::Number,
-                        Pₗs::Tuple2{AbsMatNumber},
-                        ∇̽ₜs::Tuple2{AbsMatNumber})
+function create_ⅈf′ₗ4fₜ(
+    ft::FieldType,  # type of input field Fₜ, not output field F′ₗ
+    ω::Number,
+    Pₗs::Tuple2{AbsMatNumber},
+    ∇̽ₜs::Tuple2{AbsMatNumber}
+)
     nft = Int(ft)
     nft′ = alter(nft)
 
@@ -112,11 +114,13 @@ create_βeₜ4hₜ(ω, Ps, ∇̽s, πcmps) = create_βf′ₜ4fₜ(HH, ω, Ps, �
 # F (e.g., F′ = H-field for F = E-field).
 create_βf′ₜ4fₜ(ft, ω, Ps, ∇̽s, πcmps) = sum(create_βf′ₜ4fₜ_comps(ft, ω, Ps, ∇̽s, πcmps))
 
-function create_βf′ₜ4fₜ_comps(ft::FieldType,  # type of input field Fₜ, not output field F′ₗ
-                              ω::Number,
-                              Ps::Tuple22{AbsMatNumber},
-                              ∇̽s::Tuple22{AbsMatNumber},
-                              πcmps::Tuple2{AbsMatNumber})
+function create_βf′ₜ4fₜ_comps(
+    ft::FieldType,  # type of input field Fₜ, not output field F′ₗ
+    ω::Number,
+    Ps::Tuple22{AbsMatNumber},
+    ∇̽s::Tuple22{AbsMatNumber},
+    πcmps::Tuple2{AbsMatNumber}
+)
     nft = Int(ft)
     nft′ = alter(nft)
 
@@ -141,11 +145,13 @@ function create_βf′ₜ4fₜ_comps(ft::FieldType,  # type of input field Fₜ,
     return βf′ₜ4fₜ₁, βf′ₜ4fₜ₂
 end
 
-function create_A(ft::FieldType,  # type of input field Fₜ
-                  ω::Number,
-                  Ps::Tuple22{AbsMatNumber},
-                  ∇̽s::Tuple22{AbsMatNumber},
-                  πcmps::Tuple2{AbsMatNumber})
+function create_A(
+    ft::FieldType,  # type of input field Fₜ
+    ω::Number,
+    Ps::Tuple22{AbsMatNumber},
+    ∇̽s::Tuple22{AbsMatNumber},
+    πcmps::Tuple2{AbsMatNumber}
+)
     ft′ = alter(ft)
 
     # Old implementation.  Though more straightforward, this implementation does not

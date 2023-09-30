@@ -5,10 +5,12 @@ export complete_fields
 
 # Do not export Model; qualify it with the package name MaxwellFDFD, because I would have
 # similar types in other packages such as MaxwellSALT and MaxwellGuide.
-@with_kw mutable struct Model{K,Kₑ,Kₘ,
-                              Kₑₜ,Kₘₜ,Kₑₗ,Kₘₗ,
-                              K²,K₊₂,
-                              P<:Number,AP<:AbsArr{P,K₊₂}}  # P: material parameter tensor's element type
+@with_kw mutable struct Model{
+    K,Kₑ,Kₘ,
+    Kₑₜ,Kₘₜ,Kₑₗ,Kₘₗ,
+    K²,K₊₂,
+    P<:Number,AP<:AbsArr{P,K₊₂}  # P: material parameter tensor's element type
+}
     # Frequency
     ωpml::Number = 0.0  # can be complex
 
@@ -70,8 +72,10 @@ set_boundft!(mdl::Model{K}, boundft::AbsVec{FieldType}) where {K} = (mdl.boundft
 set_Npml!(mdl::Model{K}, Npml::Tuple2{AbsVecInteger}) where {K} = (mdl.Npml = SVec{K}.(Npml); nothing)
 set_kbloch!(mdl::Model{K}, kbloch::AbsVecReal) where {K} = (mdl.kbloch = SVec{K}(kbloch); nothing)
 
-create_e⁻ⁱᵏᴸ(mdl::Model{K}) where {K} = iszero(mdl.kbloch) ? ones(SFloat{K}) :
-                                                             exp.(-im .* mdl.kbloch .* mdl.grid.L)
+create_e⁻ⁱᵏᴸ(mdl::Model{K}) where {K} =
+    iszero(mdl.kbloch) ?
+        ones(SFloat{K}) :
+        exp.(-im .* mdl.kbloch .* mdl.grid.L)
 
 # Main functions
 function clear_objs!(mdl::Model)
@@ -92,12 +96,16 @@ function clear_objs!(mdl::Model)
     return nothing
 end
 
-MaxwellBase.add_obj!(mdl::Model{K}, matname::String, shapes::AbsVec{<:Shape{K}};
-                     ε::AbsMatParam=1.0, μ::AbsMatParam=1.0) where {K} =
+MaxwellBase.add_obj!(
+    mdl::Model{K}, matname::String, shapes::AbsVec{<:Shape{K}};
+    ε::AbsMatParam=1.0, μ::AbsMatParam=1.0
+) where {K} =
     add_obj!(mdl, matname, ε=ε, μ=μ, tuple(shapes...))
 
-function MaxwellBase.add_obj!(mdl::Model{K}, matname::String, shapes::Shape{K}...;
-                              ε::AbsMatParam=1.0, μ::AbsMatParam=1.0) where {K}
+function MaxwellBase.add_obj!(
+    mdl::Model{K}, matname::String, shapes::Shape{K}...;
+    ε::AbsMatParam=1.0, μ::AbsMatParam=1.0
+) where {K}
     mat = Material(matname, ε=ε, μ=μ)
     @argcheck isbidirectional(EE, mat, mdl)  # ε should not couple transverse and longitudinal fields
     @argcheck isbidirectional(HH, mat, mdl)  # μ should not couple transverse and longitudinal fields
@@ -129,9 +137,11 @@ end
 function calc_matparams! end
 function complete_fields end
 
-function field2vec(E::NTuple{Kₑ,AbsVecNumber{K}}, H::NTuple{Kₘ,AbsVecNumber{K}},
-                   mdl::Model{K,Kₑ,Kₘ}
-                   ) where {K,Kₑ,Kₘ}
+function field2vec(
+    E::NTuple{Kₑ,AbsVecNumber{K}},
+    H::NTuple{Kₘ,AbsVecNumber{K}},
+    mdl::Model{K,Kₑ,Kₘ}
+) where {K,Kₑ,Kₘ}
     @unpack ft_eq, cmpₑₜ, cmpₘₜ, cmpfirst = mdl
 
     U = ft_eq==EE ? E : H
