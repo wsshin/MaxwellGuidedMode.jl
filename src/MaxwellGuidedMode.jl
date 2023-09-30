@@ -12,6 +12,6 @@ using Dierckx
 using LinearAlgebra: normalize!
 
 include("model/model.jl")
-include("scan_param/scan_param.jl")
+include("calc_mode.jl")
 
 end

@@ -143,7 +143,7 @@ function field2vec(E::NTuple{Kₑ,AbsVecNumber{K}}, H::NTuple{Kₘ,AbsVecNumber{
 end
 
 include("poynting.jl")
-include("calc_mode.jl")
+include("matrix.jl")
 
 # Specific models
 include("full.jl")

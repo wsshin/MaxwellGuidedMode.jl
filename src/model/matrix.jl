@@ -2,7 +2,6 @@ export create_paramops, create_curls, create_πcmps
 export create_ⅈf′ₗ4fₜ, create_ⅈhₗ4eₜ, create_ⅈeₗ4hₜ  # ⅈ is entered by \bbii<tab>
 export create_βf′ₜ4fₜ, create_βhₜ4eₜ, create_βeₜ4hₜ
 export create_A
-export calc_mode
 
 function create_stretched_∆ls(mdl::Model)
     @unpack ωpml, grid, Npml, boundft = mdl
@@ -162,37 +161,4 @@ function create_A(ft::FieldType,  # type of input field Fₜ
     A = βfₜ4f′ₜ₁ * βf′ₜ4fₜ₁ + βfₜ4f′ₜ₁ * βf′ₜ4fₜ₂ + βfₜ4f′ₜ₂ * βf′ₜ4fₜ₁  # βfₜ4f′ₜ₂ * βf′ₜ4fₜ₂ = 0 always
 
     return A
-end
-
-function calc_mode(mdl::Model, ω::Real, βguess::Number;
-                   nmode::Int=1,  # mode number
-                   fₜref::AbsVecNumber=ComplexF[])  # reference field w.r.t. which optimal phase angle is calculated
-    ## Create the eigenequation and solve it.
-    Ps = create_paramops(mdl)
-    ∇̽s = create_curls(mdl)
-    πcmps = create_πcmps(mdl)
-
-    ft_eq = mdl.ft_eq
-    A = create_A(ft_eq, ω, Ps, ∇̽s, πcmps)
-    # @show eltype(A)<:Real
-
-    β², f = eigs(A, nev=nmode, sigma=βguess^2)
-    eltype(A)<:Real && (β² = real(β²))
-
-    ind_mode = isempty(fₜref) ? nmode : findmax(abs.(fₜref'f)[:])[2]
-
-    fₜ = f[:,ind_mode]
-    β = .√β²[ind_mode]
-
-    # See RN - NLSE > December 12, 2021
-    if length(fₜref)==length(fₜ)
-        α = fₜref⋅fₜ
-        θ = -angle(α)
-        fₜ .*= exp(im*θ)
-    end
-
-    E, H = complete_fields(β, fₜ, ft_eq, ω, Ps, ∇̽s, πcmps, mdl)
-    normalize!(E, H, mdl)
-
-    return (β=β, E=E, H=H, f=fₜ)
 end
