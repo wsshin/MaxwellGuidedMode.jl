@@ -12,6 +12,8 @@ using Dierckx
 using LinearAlgebra: normalize!
 
 include("model/model.jl")
+include("poynting.jl")
+include("matrix.jl")
 include("calc_mode.jl")
 
 end

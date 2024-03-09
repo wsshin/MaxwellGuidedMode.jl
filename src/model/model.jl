@@ -155,9 +155,6 @@ function field2vec(
     return field_arr2vec(Uₜ; cmpfirst)
 end
 
-include("poynting.jl")
-include("matrix.jl")
-
 # Specific models
 include("full.jl")
 include("te.jl")
