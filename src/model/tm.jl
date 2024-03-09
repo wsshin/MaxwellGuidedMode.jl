@@ -13,12 +13,12 @@ const ModelTM{P,AP} = Model{1,2,1, 1,1, 1,0, 1,3, P,AP}
 function ModelTM(grid::Grid; APtype::Type=Array{ComplexF,3})
     ft_eq = HH
 
-    cmpₛ = SInt(1)  # shapes in transverse dimension (x-axis)
+    cmpₛ = SInt(1)  # shapes in transverse dimension (1-axis, where 123 = xyz, yzx, zxy)
 
-    cmpₑₜ = SInt(1)  # transverse E-field (x-component)
-    cmpₘₜ = SInt(2)  # transverse H-field (y-component)
+    cmpₑₜ = SInt(1)  # transverse E-field (1st component)
+    cmpₘₜ = SInt(2)  # transverse H-field (2nd component)
 
-    cmpₑₗ = SInt(3)  # longitudinal E-field (z-component)
+    cmpₑₗ = SInt(3)  # longitudinal E-field (3rd component)
     cmpₘₗ = SInt()  # longitudinal H-field (no component)
 
     iseₜ˔shp = false
