@@ -9,8 +9,6 @@ const ModelFull{P,AP} = Model{2,3,3, 2,2, 1,1, 4,4, P,AP}
 function ModelFull(grid::Grid; APtype::Type=Array{ComplexF,4})
     ft_eq = EE
 
-    cmpₛ = SInt(1,2)  # shapes in transverse dimension (12-plane, where 123 = xyz, yzx, or zxy)
-
     cmpₑₜ = SInt(1,2)  # transverse E-field (1st and 2nd components)
     cmpₘₜ = SInt(1,2)  # transverse H-field (1st and 2nd components)
 
@@ -20,7 +18,7 @@ function ModelFull(grid::Grid; APtype::Type=Array{ComplexF,4})
     iseₜ˔shp = false
     ishₜ˔shp = false
 
-    return ModelFull{eltype(APtype),APtype}(; ft_eq, grid, cmpₛ, cmpₑₜ, cmpₘₜ, cmpₑₗ, cmpₘₗ, iseₜ˔shp, ishₜ˔shp)
+    return ModelFull{eltype(APtype),APtype}(; ft_eq, grid, cmpₑₜ, cmpₘₜ, cmpₑₗ, cmpₘₗ, iseₜ˔shp, ishₜ˔shp)
 end
 
 # Assign the material parameters on the grid and smooth them.

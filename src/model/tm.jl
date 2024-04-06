@@ -13,8 +13,6 @@ const ModelTM{P,AP} = Model{1,2,1, 1,1, 1,0, 1,3, P,AP}
 function ModelTM(grid::Grid; APtype::Type=Array{ComplexF,3})
     ft_eq = HH
 
-    cmpₛ = SInt(1)  # shapes in transverse dimension (1-axis, where 123 = xyz, yzx, zxy)
-
     cmpₑₜ = SInt(1)  # transverse E-field (1st component)
     cmpₘₜ = SInt(2)  # transverse H-field (2nd component)
 
@@ -24,7 +22,7 @@ function ModelTM(grid::Grid; APtype::Type=Array{ComplexF,3})
     iseₜ˔shp = false
     ishₜ˔shp = true
 
-    return ModelTM{eltype(APtype),APtype}(; ft_eq, grid, cmpₛ, cmpₑₜ, cmpₘₜ, cmpₑₗ, cmpₘₗ, iseₜ˔shp, ishₜ˔shp)
+    return ModelTM{eltype(APtype),APtype}(; ft_eq, grid, cmpₑₜ, cmpₘₜ, cmpₑₗ, cmpₘₗ, iseₜ˔shp, ishₜ˔shp)
 end
 
 # Assign the material parameters on the grid and smooth them.

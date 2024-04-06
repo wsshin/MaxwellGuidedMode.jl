@@ -48,7 +48,7 @@ end
 function create_curls(mdl::Model)
     _, (s∆lₑ⁻¹, s∆lₘ⁻¹) = create_stretched_∆ls(mdl)
 
-    @unpack grid, boundft, cmpₛ, cmpₑₜ, cmpₘₜ, cmpₑₗ, cmpₘₗ, cmpfirst = mdl
+    @unpack grid, boundft, cmpₑₜ, cmpₘₜ, cmpₑₗ, cmpₘₗ, cmpfirst = mdl
     isbloch = grid.isbloch
 
     e⁻ⁱᵏᴸ = create_e⁻ⁱᵏᴸ(mdl)
@@ -58,11 +58,11 @@ function create_curls(mdl::Model)
 
     # The following lines work even if the model does not deal with the corresponding
     # longitudinal components.
-    ∇̽ₑₜ = create_curl(isfwdₑ, s∆lₘ⁻¹, isbloch, e⁻ⁱᵏᴸ; cmp_shp=cmpₛ, cmp_out=cmpₘₗ, cmp_in=cmpₑₜ, cmpfirst)
-    ∇̽ₘₜ = create_curl(isfwdₘ, s∆lₑ⁻¹, isbloch, e⁻ⁱᵏᴸ; cmp_shp=cmpₛ, cmp_out=cmpₑₗ, cmp_in=cmpₘₜ, cmpfirst)
+    ∇̽ₑₜ = create_curl(isfwdₑ, s∆lₘ⁻¹, isbloch, e⁻ⁱᵏᴸ; cmp_out=cmpₘₗ, cmp_in=cmpₑₜ, cmpfirst)
+    ∇̽ₘₜ = create_curl(isfwdₘ, s∆lₑ⁻¹, isbloch, e⁻ⁱᵏᴸ; cmp_out=cmpₑₗ, cmp_in=cmpₘₜ, cmpfirst)
 
-    ∇̽ₑₗ = create_curl(isfwdₑ, s∆lₘ⁻¹, isbloch, e⁻ⁱᵏᴸ; cmp_shp=cmpₛ, cmp_out=cmpₘₜ, cmp_in=cmpₑₗ, cmpfirst)
-    ∇̽ₘₗ = create_curl(isfwdₘ, s∆lₑ⁻¹, isbloch, e⁻ⁱᵏᴸ; cmp_shp=cmpₛ, cmp_out=cmpₑₜ, cmp_in=cmpₘₗ, cmpfirst)
+    ∇̽ₑₗ = create_curl(isfwdₑ, s∆lₘ⁻¹, isbloch, e⁻ⁱᵏᴸ; cmp_out=cmpₘₜ, cmp_in=cmpₑₗ, cmpfirst)
+    ∇̽ₘₗ = create_curl(isfwdₘ, s∆lₑ⁻¹, isbloch, e⁻ⁱᵏᴸ; cmp_out=cmpₑₜ, cmp_in=cmpₘₗ, cmpfirst)
 
     return (∇̽ₑₜ,∇̽ₘₜ), (∇̽ₑₗ,∇̽ₘₗ)
 end
