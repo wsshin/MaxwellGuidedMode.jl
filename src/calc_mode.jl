@@ -21,7 +21,7 @@ function calc_mode(
 
     βguess = neff_guess * ω
 
-    return calc_mode(mdl, ω, βguess; nmode, fₜref=fₜ_prev)
+    return calc_mode(mdl, ω, βguess; nmode, fₜref=fₜprev)
 end
 
 function calc_mode(
