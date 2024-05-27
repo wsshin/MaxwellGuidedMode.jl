@@ -97,13 +97,13 @@ end
 
 MaxwellBase.add_obj!(
     mdl::Model{K}, matname::String, shapes::AbsVec{<:Shape{K}};
-    ε::AbsMatParam=1.0, μ::AbsMatParam=1.0
+    ε::AbstractMatParam=1.0, μ::AbstractMatParam=1.0
 ) where {K} =
     add_obj!(mdl, matname, ε=ε, μ=μ, tuple(shapes...))
 
 function MaxwellBase.add_obj!(
     mdl::Model{K}, matname::String, shapes::Shape{K}...;
-    ε::AbsMatParam=1.0, μ::AbsMatParam=1.0
+    ε::AbstractMatParam=1.0, μ::AbstractMatParam=1.0
 ) where {K}
     mat = Material(matname, ε=ε, μ=μ)
     @argcheck isbidirectional(EE, mat, mdl)  # ε should not couple transverse and longitudinal fields

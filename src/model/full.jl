@@ -45,45 +45,45 @@ function calc_matparams!(mdl::ModelFull)
     ishₗ˔shp = true
 
     # Create temporary storages.
-    oind2d_εxx = create_oind_array(N)
-    oind2d_εyy = create_oind_array(N)
-    oind2d_εzz = create_oind_array(N)
-    oind2d_εoo = create_oind_array(N)
+    oind2d_ε₁₁ = create_oind_array(N)
+    oind2d_ε₂₂ = create_oind_array(N)
+    oind2d_ε₃₃ = create_oind_array(N)
+    oind2d_ε₀₀ = create_oind_array(N)
 
-    oind2d_μxx = create_oind_array(N)
-    oind2d_μyy = create_oind_array(N)
-    oind2d_μzz = create_oind_array(N)
-    oind2d_μoo = create_oind_array(N)
+    oind2d_μ₁₁ = create_oind_array(N)
+    oind2d_μ₂₂ = create_oind_array(N)
+    oind2d_μ₃₃ = create_oind_array(N)
+    oind2d_μ₀₀ = create_oind_array(N)
 
     # Assign the material parameters.
     # (See the figure in L10 - Eigenmode Analysis > 1.3 Waveguide mode analysis > Matrix
     # equation formulation.)
-    assign_param!(εₜarr, (oind2d_εyy,oind2d_εxx), shp4oind, εind4oind, εₜ4εind, gtₑ, τlg, isbloch)  # diagonal entries of εₜ tensors
-    assign_param!(εₜarr, tuple(oind2d_μzz), shp4oind, εind4oind, εₜ4εind, gtₑ, τlg, isbloch)  # off-diagonal entries of εₜ tensors
-    assign_param!(µₗarr, tuple(oind2d_εoo), shp4oind, μind4oind, μₗ4μind, gtₘ, τlg, isbloch)  # μₗ tensors (rank-0, so scalars)
+    assign_param!(εₜarr, (oind2d_ε₂₂,oind2d_ε₁₁), shp4oind, εind4oind, εₜ4εind, gtₑ, τlg, isbloch)  # diagonal entries of εₜ tensors
+    assign_param!(εₜarr, tuple(oind2d_μ₃₃), shp4oind, εind4oind, εₜ4εind, gtₑ, τlg, isbloch)  # off-diagonal entries of εₜ tensors
+    assign_param!(µₗarr, tuple(oind2d_ε₀₀), shp4oind, μind4oind, μₗ4μind, gtₘ, τlg, isbloch)  # μₗ tensors (rank-0, so scalars)
 
-    assign_param!(µₜarr, (oind2d_μyy,oind2d_μxx), shp4oind, μind4oind, μₜ4μind, gtₘ, τlg, isbloch)  # diagonal entries of μₜ tensors
-    assign_param!(µₜarr, tuple(oind2d_εzz), shp4oind, μind4oind, μₜ4μind, gtₘ, τlg, isbloch)  # off-diagonal entries of μₜ tensors
-    assign_param!(εₗarr, tuple(oind2d_μoo), shp4oind, εind4oind, εₗ4εind, gtₑ, τlg, isbloch)  # εₗ tensors (rank-0, so scalars)
+    assign_param!(µₜarr, (oind2d_μ₂₂,oind2d_μ₁₁), shp4oind, μind4oind, μₜ4μind, gtₘ, τlg, isbloch)  # diagonal entries of μₜ tensors
+    assign_param!(µₜarr, tuple(oind2d_ε₃₃), shp4oind, μind4oind, μₜ4μind, gtₘ, τlg, isbloch)  # off-diagonal entries of μₜ tensors
+    assign_param!(εₗarr, tuple(oind2d_μ₀₀), shp4oind, εind4oind, εₗ4εind, gtₑ, τlg, isbloch)  # εₗ tensors (rank-0, so scalars)
 
-    # Some temporary arrays should be identical.  For example, oind2d_εyy and oind2d_μxx are
-    # evaluated at the locations surrounding the εyy and μxx locations, which are the same
+    # Some temporary arrays should be identical.  For example, oind2d_ε₂₂ and oind2d_μ₁₁ are
+    # evaluated at the locations surrounding the ε₂₂ and μ₁₁ locations, which are the same
     # locations.  (See the figure in L10 - Eigenmode Analysis > 1.3 Waveguide mode analysis
-    # > Matrix equation formulation.)  Therefore, oind2d_εyy and oind2d_μxx are evaluated at
+    # > Matrix equation formulation.)  Therefore, oind2d_ε₂₂ and oind2d_μ₁₁ are evaluated at
     # the same locations, so they should be the same object indices.
-    @assert isequal(oind2d_εxx, oind2d_μyy)
-    @assert isequal(oind2d_εyy, oind2d_μxx)
-    @assert isequal(oind2d_εoo, oind2d_εzz)
-    @assert isequal(oind2d_μoo, oind2d_μzz)
+    @assert isequal(oind2d_ε₁₁, oind2d_μ₂₂)
+    @assert isequal(oind2d_ε₂₂, oind2d_μ₁₁)
+    @assert isequal(oind2d_ε₀₀, oind2d_ε₃₃)
+    @assert isequal(oind2d_μ₀₀, oind2d_μ₃₃)
 
     # Smooth the material parameters.
-    smooth_param!(εₜarr, (oind2d_εxx,oind2d_εyy), shp4oind, εind4oind, εₜ4εind, gtₑ, l, lg, σ, ∆τ, iseₜ˔shp)  # diagonal entries of εₜ tensors
-    smooth_param!(εₜarr, tuple(oind2d_εoo), shp4oind, εind4oind, εₜ4εind, gtₑ, l, lg, σ, ∆τ, iseₜ˔shp)  # off-diagonal entries of εₜ tensors
-    smooth_param!(µₗarr, tuple(oind2d_μzz), shp4oind, μind4oind, μₗ4μind, gtₘ, l, lg, σ, ∆τ, ishₗ˔shp)  # μₗ tensors (rank-0, so scalars)
+    smooth_param!(εₜarr, (oind2d_ε₁₁,oind2d_ε₂₂), shp4oind, εind4oind, εₜ4εind, gtₑ, l, lg, σ, ∆τ, iseₜ˔shp)  # diagonal entries of εₜ tensors
+    smooth_param!(εₜarr, tuple(oind2d_ε₀₀), shp4oind, εind4oind, εₜ4εind, gtₑ, l, lg, σ, ∆τ, iseₜ˔shp)  # off-diagonal entries of εₜ tensors
+    smooth_param!(µₗarr, tuple(oind2d_μ₃₃), shp4oind, μind4oind, μₗ4μind, gtₘ, l, lg, σ, ∆τ, ishₗ˔shp)  # μₗ tensors (rank-0, so scalars)
 
-    smooth_param!(µₜarr, (oind2d_μxx,oind2d_μyy), shp4oind, μind4oind, μₜ4μind, gtₘ, l, lg, σ, ∆τ, ishₜ˔shp)  # diagonal entries of μₜ tensors
-    smooth_param!(µₜarr, tuple(oind2d_μoo), shp4oind, μind4oind, μₜ4μind, gtₘ, l, lg, σ, ∆τ, ishₜ˔shp)  # off-diagonal entries of μₜ tensors
-    smooth_param!(εₗarr, tuple(oind2d_εzz), shp4oind, εind4oind, εₗ4εind, gtₑ, l, lg, σ, ∆τ, iseₗ˔shp)  # εₗ tensors (rank-0, so scalars)
+    smooth_param!(µₜarr, (oind2d_μ₁₁,oind2d_μ₂₂), shp4oind, μind4oind, μₜ4μind, gtₘ, l, lg, σ, ∆τ, ishₜ˔shp)  # diagonal entries of μₜ tensors
+    smooth_param!(µₜarr, tuple(oind2d_μ₀₀), shp4oind, μind4oind, μₜ4μind, gtₘ, l, lg, σ, ∆τ, ishₜ˔shp)  # off-diagonal entries of μₜ tensors
+    smooth_param!(εₗarr, tuple(oind2d_ε₃₃), shp4oind, εind4oind, εₗ4εind, gtₑ, l, lg, σ, ∆τ, iseₗ˔shp)  # εₗ tensors (rank-0, so scalars)
 
     return nothing
 end
@@ -122,18 +122,18 @@ function complete_fields(
     cmpfirst = mdl.cmpfirst
     d = cmpfirst ? 1 : length(sz)
 
-    Fx = selectdim(Fₜ, d, 1)
-    Fy = selectdim(Fₜ, d, 2)
+    F₁ = selectdim(Fₜ, d, 1)
+    F₂ = selectdim(Fₜ, d, 2)
 
-    F′x = selectdim(F′ₜ, d, 1)
-    F′y = selectdim(F′ₜ, d, 2)
+    F′₁ = selectdim(F′ₜ, d, 1)
+    F′₂ = selectdim(F′ₜ, d, 2)
 
     sz_grid = size(mdl.grid)
-    Fz = reshape(fₗ, sz_grid)
-    F′z = reshape(f′ₗ, sz_grid)
+    F₃ = reshape(fₗ, sz_grid)
+    F′₃ = reshape(f′ₗ, sz_grid)
 
-    F = (Fx, Fy, Fz)
-    F′ = (F′x, F′y, F′z)
+    F = (F₁, F₂, F₃)
+    F′ = (F′₁, F′₂, F′₃)
 
     E, H = ft==EE ? (F,F′) : (F′,F)
 
@@ -142,8 +142,8 @@ end
 
 # See the field configurations in L10 - Eigenmode Analysis > Matrix equation formulation.
 function poynting(
-    E::Tuple3{AbsMatNumber},  # (Ex, Ey, Ez)
-    H::Tuple3{AbsMatNumber},  # (Hx, Hy, Hz)
+    E::Tuple3{AbsMatNumber},  # (E₁, E₂, E₃)
+    H::Tuple3{AbsMatNumber},  # (H₁, H₂, H₃)
     mdl::ModelFull
 )
     boundft = mdl.boundft
@@ -152,45 +152,49 @@ function poynting(
 
     ∆l, ∆l⁻¹ = create_∆ls(grid, boundft)
 
-    Ex, Ey, Ez = E
-    Hx, Hy, Hz = H
+    E₁, E₂, E₃ = E
+    H₁, H₂, H₃ = H
 
-    nX, nY = 1, 2
+    dir₁, dir₂ = 1, 2
 
     Ftemp = ArrComplexF(undef, size(grid))  # matrix; temporary storage
 
-    # Calculate Sx.
-    Sx = ArrComplexF(undef, size(grid))  # matrix
+    # Below, note that the grid is 2D Yee's grid in the plane of the directions 1 and 2.
+    # The field components in the direction 3 are defined on this plane, and their locations
+    # are the projection of the direction-3 components of 3D Yee's grid onto the plane.
 
-    m̂xHz = Ftemp; interp_field!(m̂xHz, Hz, HH, nX, ∆l, ∆l⁻¹, boundft, isbloch)  # intepolate Hz at Ey-locations
-    Sx .= Ey .* conj.(m̂xHz)  # EyHz evaluated at centers of x-normal edges
+    # Calculate S₁.
+    S₁ = ArrComplexF(undef, size(grid))  # matrix
 
-    m̂xHy = Ftemp; interp_field!(m̂xHy, Hy, HH, nX, ∆l, ∆l⁻¹, boundft, isbloch)  # intepolate Hy at Ez-locations
-    m̂xHy .= Ez .* conj.(m̂xHy)  # EzHy evaluated at end points of x-normal edges; need to interpolate at centers
-    Sx₋ = m̂xHy
+    m̂₁H₃ = Ftemp; interp_field!(m̂₁H₃, H₃, HH, dir₁, ∆l, ∆l⁻¹, boundft, isbloch)  # intepolate H₃ at E₂-locations
+    S₁ .= E₂ .* conj.(m̂₁H₃)  # E₂H₃ evaluated at centers of edges normal to direction 1
 
-    interp_field!(Sx, Sx₋, EE, nY, ∆l, ∆l⁻¹, boundft, isbloch, α=-1.0, overwrite=false)  # interpolate Sx₋ at centers of x-normal edges
+    m̂₁H₂ = Ftemp; interp_field!(m̂₁H₂, H₂, HH, dir₁, ∆l, ∆l⁻¹, boundft, isbloch)  # intepolate H₂ at E₃-locations
+    m̂₁H₂ .= E₃ .* conj.(m̂₁H₂)  # E₃H₂ evaluated at end points of edges normal to direction 1; need to be interpolated at edge centers
+    S₁₋ = m̂₁H₂
 
-    # Calculate Sy.
-    Sy = ArrComplexF(undef, size(grid))  # matrix
+    interp_field!(S₁, S₁₋, EE, dir₂, ∆l, ∆l⁻¹, boundft, isbloch, α=-1, overwrite=false)  # interpolate S₁₋ at centers of edges normal to direction 1
 
-    m̂yHz = Ftemp; interp_field!(m̂yHz, Hz, HH, nY, ∆l, ∆l⁻¹, boundft, isbloch)  # intepolate Hz at Ex-locations
-    Sy .= -1.0 .* Ex .* conj.(m̂yHz)  # ExHz evaluated at centers of y-normal edges
+    # Calculate S₂.
+    S₂ = ArrComplexF(undef, size(grid))  # matrix
 
-    m̂yHx = Ftemp; interp_field!(m̂yHx, Hx, HH, nY, ∆l, ∆l⁻¹, boundft, isbloch)  # intepolate Hx at Ez-locations
-    m̂yHx .= Ez .* conj.(m̂yHx)  # EzHx evaluated at end points of y-normal edges; need to interpolate at centers
-    Sy₊ = m̂yHx
+    m̂₂H₃ = Ftemp; interp_field!(m̂₂H₃, H₃, HH, dir₂, ∆l, ∆l⁻¹, boundft, isbloch)  # intepolate H₃ at E₁-locations
+    S₂ .= -1 .* E₁ .* conj.(m̂₂H₃)  # E₁H₃ evaluated at centers of edges normal to direction 2
 
-    interp_field!(Sy, Sy₊, EE, nX, ∆l, ∆l⁻¹, boundft, isbloch, overwrite=false)  # interpolate Sy₊ at centers of y-normal edges
+    m̂₂H₁ = Ftemp; interp_field!(m̂₂H₁, H₁, HH, dir₂, ∆l, ∆l⁻¹, boundft, isbloch)  # intepolate H₁ at E₃-locations
+    m̂₂H₁ .= E₃ .* conj.(m̂₂H₁)  # E₃H₁ evaluated at end points of edges normal to direction 2; need to be interpolated at edge centers
+    S₂₊ = m̂₂H₁
 
-    # Calculate Sz.
-    Sz = ArrComplexF(undef, size(grid))  # matrix
+    interp_field!(S₂, S₂₊, EE, dir₁, ∆l, ∆l⁻¹, boundft, isbloch, overwrite=false)  # interpolate S₂₊ at centers of edges normal to direction 2
 
-    Sz₊ = Ftemp; Sz₊ .= Ex .* conj.(Hy)  # Ex and Hy are already co-located
-    interp_field!(Sz, Sz₊, EE, nY, ∆l, ∆l⁻¹, boundft, isbloch)  # Sz₊ interpolated at centers of pixels
+    # Calculate S₃.
+    S₃ = ArrComplexF(undef, size(grid))  # matrix
 
-    Sz₋ = Ftemp; Sz₋ .= Ey .* conj.(Hx)  # Ey and Hx are already co-located
-    interp_field!(Sz, Sz₋, EE, nX, ∆l, ∆l⁻¹, boundft, isbloch, α=-1.0, overwrite=false)  # Sz₋ interpolated at centers of pixels
+    S₃₊ = Ftemp; S₃₊ .= E₁ .* conj.(H₂)  # E₁ and H₂ are already co-located
+    interp_field!(S₃, S₃₊, EE, dir₂, ∆l, ∆l⁻¹, boundft, isbloch)  # S₃₊ interpolated at centers of pixels
 
-    return Sx, Sy, Sz
+    S₃₋ = Ftemp; S₃₋ .= E₂ .* conj.(H₁)  # E₂ and H₁ are already co-located
+    interp_field!(S₃, S₃₋, EE, dir₁, ∆l, ∆l⁻¹, boundft, isbloch, α=-1, overwrite=false)  # S₃₋ interpolated at centers of pixels
+
+    return S₁, S₂, S₃
 end

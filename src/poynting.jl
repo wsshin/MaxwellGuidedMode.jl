@@ -7,8 +7,17 @@ export poynting, powerₗ
 #
 # Therefore, when averaging the E- and H-fields for the Poynting vector calculation, the
 # weight factors ∆l shouldn't contain the PML scale factors (i.e., we should not use s∆l).
-# As long as we use real ∆l, we can average the Poynting vector before the last step, e.g.,
-# Sz = ½ Re{Ex Hy＊ - Ey Hx＊} = ½ Re{Ex Hy＊} - ½ Re{Ey Hx＊}.
+# As long as we use real ∆l, we can average the Poynting vector before the last step.  In
+# other words, from
+#
+# S = E×H＊ + E＊×H = 2 Re[E×H＊],
+#
+# we have
+#
+# Sz = 2 Re[Ex Hy＊ - Ey Hx＊] = 2 Re[Ex Hy＊] - 2 Re[Ey Hx＊].
+#
+# Among the two factors inside each Re[], I remember the averaging operation is applied to only and some of the averaged Cartesian components of the fields in this formula can be
+# averaged
 #
 # Also note that the time-averaged Poynting vector is meaningful only for real frequency ω.
 # This is usually not a problem because
@@ -55,7 +64,7 @@ function interp_field!(
 ) where {K}
     nft = Int(ft); nft′ = alter(nft)
     isfwd = boundft[nw]==ft
-    apply_m̂!(G, F, nw, isfwd, ∆l[nft][nw], ∆l⁻¹[nft′][nw], isbloch[nw]; kwargs...)  # intepolate Hz at Ey-locations
+    apply_m̂!(G, F, nw, isfwd, ∆l[nft][nw], ∆l⁻¹[nft′][nw], isbloch[nw]; kwargs...)
 
     return nothing
 end

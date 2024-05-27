@@ -4,7 +4,7 @@
 # The type parameter AP specifies device-specific arrays types (e.g., CuArray) and is
 # user-defined in the constructor.
 #
-# Note that the TE mode has (Ey, Hx, Hz) as nonzero components; this is unlike TE Maxwell's
+# Note that the TE mode has (E₂, H₁, H₃) as nonzero components; this is unlike TE Maxwell's
 # equations that have two E-field components and one H-field component.
 
 const ModelTE{P,AP} = Model{1,1,2, 1,1, 0,1, 1,3, P,AP}
@@ -47,26 +47,26 @@ function calc_matparams!(mdl::ModelTE)
     ishₗ˔shp = true
 
     # Create temporary storages.
-    # Because Ey and Hx are at the same locations, smoothing them can use the same object
+    # Because E₂ and H₁ are at the same locations, smoothing them can use the same object
     # index.
-    oind2d_pₜ = create_oind_array(N)  # for εₜ (= εyy) and μₜ (= μxx)
-    oind2d_pₗ = create_oind_array(N)  # for μₗ (= μzz)
+    oind2d_pₜ = create_oind_array(N)  # for εₜ (= ε₂₂) and μₜ (= μ₁₁)
+    oind2d_pₗ = create_oind_array(N)  # for μₗ (= μ₃₃)
     oind2d′_pₗ = create_oind_array(N)  # for @assert below
 
     # Assign the material parameters.
     # Note that μₜarr uses gtₑ rather than gtₘ, because it is rank-0 tensor and its locations
     # are the E-field locations; see the definition MaxwellBase/assign_param!().
     # (See the figure in L10 - Eigenmode Analysis > 1.3 Waveguide mode analysis > Matrix
-    # equation formulation; take the cross section through Ey, Hx, Hz.)
+    # equation formulation; take the cross section through E₂, H₁, H₃.)
     assign_param!(εₜarr, tuple(oind2d_pₗ), shp4oind, εind4oind, εₜ4εind, gtₑ, τlg, isbloch)  # εₜ tensors (rank-0, so scalars)
     assign_param!(µₜarr, tuple(oind2d′_pₗ), shp4oind, μind4oind, μₜ4μind, gtₑ, τlg, isbloch)  # μₜ tensors (rank-0, so scalars)
     assign_param!(µₗarr, tuple(oind2d_pₜ), shp4oind, μind4oind, μₗ4μind, gtₘ, τlg, isbloch)  # μₗ tensors (rank-0, so scalars)
 
-    # Some temporary arrays should be identical.  Specifically, oind2d_εyy and oind2d_μxx
-    # are evaluated at the locations surrounding the εyy and μxx locations, which are the
+    # Some temporary arrays should be identical.  Specifically, oind2d_ε₂₂ and oind2d_μ₁₁
+    # are evaluated at the locations surrounding the ε₂₂ and μ₁₁ locations, which are the
     # same locations.  (See the figure in L10 - Eigenmode Analysis > 1.3 Waveguide mode
-    # analysis > Matrix equation formulation; take the cross section through Ey, Hx, Hz.)
-    # Therefore, oind2d_εyy and oind2d_μxx are evaluated at the same locations, so they
+    # analysis > Matrix equation formulation; take the cross section through E₂, H₁, H₃.)
+    # Therefore, oind2d_ε₂₂ and oind2d_μ₁₁ are evaluated at the same locations, so they
     # should be the same object indices.
     @assert isequal(oind2d′_pₗ, oind2d_pₗ)
 
@@ -100,17 +100,17 @@ function complete_fields(
 
     # Take the Cartesian components of the fields and reshape them into arrays.
     sz_grid = size(mdl.grid)
-    Ey = reshape(eₜ, sz_grid)
-    Hx = reshape(hₜ, sz_grid)
-    Hz = reshape(hₗ, sz_grid)
+    E₂ = reshape(eₜ, sz_grid)
+    H₁ = reshape(hₜ, sz_grid)
+    H₃ = reshape(hₗ, sz_grid)
 
-    return (E=Ey, H=(Hx, Hz))
+    return (E=E₂, H=(H₁, H₃))
 end
 
 # See the field configurations in L10 - Eigenmode Analysis > Matrix equation formulation.
 function poynting(
-    E::AbsVecNumber,  # Ey
-    H::Tuple2{AbsVecNumber},  # (Hx, Hz)
+    E::AbsVecNumber,  # E₂
+    H::Tuple2{AbsVecNumber},  # (H₁, H₃)
     mdl::ModelTE
 )
     boundft = mdl.boundft
@@ -119,22 +119,22 @@ function poynting(
 
     ∆l, ∆l⁻¹ = create_∆ls(grid, boundft)
 
-    Ey = E
-    Hx, Hz = H
+    E₂ = E
+    H₁, H₃ = H
 
-    nX = 1
+    dir₁ = 1
 
     Ftemp = ArrComplexF(undef, size(grid))  # vector; temporary storage
 
-    # Calculate Sx.
-    Sx = ArrComplexF(undef, size(grid))  # vector
-    m̂xHz = Ftemp; interp_field!(m̂xHz, Hz, HH, nX, ∆l, ∆l⁻¹, boundft, isbloch)
-    Sx .= Ey .* conj.(m̂xHz)
+    # Calculate S₁.
+    S₁ = ArrComplexF(undef, size(grid))  # vector
+    m̂₁H₃ = Ftemp; interp_field!(m̂₁H₃, H₃, HH, dir₁, ∆l, ∆l⁻¹, boundft, isbloch)
+    S₁ .= E₂ .* conj.(m̂₁H₃)
 
-    # Calculate Sz.
-    Sz = ArrComplexF(undef, size(grid))  # vector
-    Sz₋ = Ftemp; Sz₋ .= Ey .* conj.(Hx)  # real array located at Ey
-    interp_field!(Sz, Sz₋, EE, nX, ∆l, ∆l⁻¹, boundft, isbloch, α=-1.0)
+    # Calculate S₃.
+    S₃ = ArrComplexF(undef, size(grid))  # vector
+    S₃₋ = Ftemp; S₃₋ .= E₂ .* conj.(H₁)  # real array located at E₂
+    interp_field!(S₃, S₃₋, EE, dir₁, ∆l, ∆l⁻¹, boundft, isbloch, α=-1)
 
-    return Sx, Sz
+    return S₁, S₃
 end
