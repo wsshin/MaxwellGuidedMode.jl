@@ -3,6 +3,10 @@ export create_e⁻ⁱᵏᴸ
 export clear_objs!  # plural because clearing both electric and magnetic quantities
 export complete_fields
 
+# Implement the following functions for each specific Model.
+function calc_matparams! end
+function complete_fields end
+
 # Do not export Model; qualify it with the package name MaxwellFDFD, because I would have
 # similar types in other packages such as MaxwellSALT and MaxwellGuide.
 @with_kw mutable struct Model{
@@ -131,10 +135,6 @@ function isbidirectional(ft::FieldType, mat::Material, mdl::Model)
 
     return iszero(param[cmpₜ,cmpₗ]) && iszero(param[cmpₗ,cmpₜ])
 end
-
-# Implement the following functions for each specific Model.
-function calc_matparams! end
-function complete_fields end
 
 # This function is not used currently; not sure if this will be needed.
 function field2vec(

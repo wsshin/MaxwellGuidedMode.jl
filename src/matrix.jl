@@ -79,10 +79,25 @@ function create_πcmps(mdl::Model{K}) where {K}
     return πcmpₑ, πcmpₘ
 end
 
-create_ⅈhₗ4eₜ(ω, Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}}, ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}}) = create_ⅈf′ₗ4fₜ(EE, ω, Ps, ∇̽s)
-create_ⅈeₗ4hₜ(ω, Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}}, ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}}) = create_ⅈf′ₗ4fₜ(HH, ω, Ps, ∇̽s)
+create_ⅈhₗ4eₜ(
+    ω,
+    Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
+    ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}}
+) =
+    create_ⅈf′ₗ4fₜ(EE, ω, Ps, ∇̽s)
 
-create_ⅈf′ₗ4fₜ(ft, ω, Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}}, ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}}) =
+create_ⅈeₗ4hₜ(
+    ω,
+    Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
+    ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}}
+) =
+    create_ⅈf′ₗ4fₜ(HH, ω, Ps, ∇̽s)
+
+create_ⅈf′ₗ4fₜ(
+    ft, ω,
+    Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
+    ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}}
+) =
     create_ⅈf′ₗ4fₜ(ft, ω, Ps[2], ∇̽s[1])
 
 # Create the operator that generates im * F′ₗ from Fₜ, where F′ is the field complementary
