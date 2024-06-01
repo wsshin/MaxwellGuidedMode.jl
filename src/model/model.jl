@@ -149,7 +149,7 @@ function field2vec(
     Uₜ = cat(U[cmpᵤₜ]..., dims=K+1)
 
     if cmpfirst
-        Uₜ = permutedims(Uₜ, circshift(1:K, 1))
+        Uₜ = permutedims(Uₜ, circshift(1:K+1, 1))
     end
 
     return field_arr2vec(Uₜ; cmpfirst)
