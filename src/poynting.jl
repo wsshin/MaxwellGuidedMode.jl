@@ -52,14 +52,14 @@ function poynting end
 
 # Used in poynting().
 function interp_field!(
-    G::AbsArrComplexF{K},  # where averaged fields are stored
-    F::AbsArrComplexF{K},  # field to average
+    G::AbstractArray{ComplexF64,K},  # where averaged fields are stored
+    F::AbstractArray{ComplexF64,K},  # field to average
     ft::FieldType,  # type of field to average
     nw::Int,  # direction of averaging
-    ∆l::Tuple2{NTuple{K,VecFloat}},
-    ∆l⁻¹::Tuple2{NTuple{K,VecFloat}},
-    boundft::SVec{K,FieldType},
-    isbloch::SBool{K};
+    ∆l::NTuple{2,NTuple{K,Vector{Float64}}},
+    ∆l⁻¹::NTuple{2,NTuple{K,Vector{Float64}}},
+    boundft::SVector{K,FieldType},
+    isbloch::SVector{K,Bool};
     kwargs...  # keyword arguments for apply_m̂!()
 ) where {K}
     nft = Int(ft); nft′ = alter(nft)
@@ -71,8 +71,8 @@ end
 
 # Calculate the power along the longitudinal direction.
 function powerₗ(
-    E::NTuple{Kₑ,AbsArrNumber{K}},
-    H::NTuple{Kₘ,AbsArrNumber{K}},
+    E::NTuple{Kₑ,AbstractArray{<:Number,K}},
+    H::NTuple{Kₘ,AbstractArray{<:Number,K}},
     mdl::Model{K,Kₑ,Kₘ}
 ) where {K,Kₑ,Kₘ}
     S = poynting(E, H, mdl)
@@ -88,8 +88,8 @@ function powerₗ(
 end
 
 function LinearAlgebra.normalize!(
-    E::NTuple{Kₑ,AbsArrNumber{K}},
-    H::NTuple{Kₘ,AbsArrNumber{K}},
+    E::NTuple{Kₑ,AbstractArray{<:Number,K}},
+    H::NTuple{Kₘ,AbstractArray{<:Number,K}},
     mdl::Model{K,Kₑ,Kₘ}
 ) where {K,Kₑ,Kₘ}
     Pz = powerₗ(E, H, mdl)

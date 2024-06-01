@@ -9,7 +9,7 @@ export complete_fields
     K,Kₑ,Kₘ,
     Kₑₜ,Kₘₜ,Kₑₗ,Kₘₗ,
     K²,K₊₂,
-    P<:Number,AP<:AbsArr{P,K₊₂}  # P: material parameter tensor's element type
+    P<:Number,AP<:AbstractArray{P,K₊₂}  # P: material parameter tensor's element type
 }
     # Frequency
     ωpml::Number = 0.0  # can be complex
@@ -22,15 +22,15 @@ export complete_fields
 
     # Component information used for creating generalized curls
     # See L10 - Eigenmode Analysis > [Aug/27/2021] Attempt to recover similarity between 1D and 2D cases.
-    cmpₑₜ::SInt{Kₑₜ}  # Cartesian components of transverse E-field
-    cmpₘₜ::SInt{Kₘₜ}  # Cartesian components of transverse H-field
-    cmpₑₗ::SInt{Kₑₗ}  # Cartesian components of longitudinal E-field
-    cmpₘₗ::SInt{Kₘₗ}  # Cartesian components of longitudinal H-field
+    cmpₑₜ::SVector{Kₑₜ,Int}  # Cartesian components of transverse E-field
+    cmpₘₜ::SVector{Kₘₜ,Int}  # Cartesian components of transverse H-field
+    cmpₑₗ::SVector{Kₑₗ,Int}  # Cartesian components of longitudinal E-field
+    cmpₘₗ::SVector{Kₘₗ,Int}  # Cartesian components of longitudinal H-field
 
     # Boundary properties (in transverse directions)
-    boundft::SVec{K,FieldType} = SVec(ntuple(k->EE, Val(K)))
-    Npml::Tuple2{SInt{K}} = (SVec(ntuple(k->0, Val(K))), SVec(ntuple(k->0, Val(K))))
-    kbloch::SFloat{K} = SVec(ntuple(k->0.0, Val(K)))  # [kx_bloch, ky_bloch, kz_bloch]
+    boundft::SVector{K,FieldType} = fill(EE, SVector{K})
+    Npml::NTuple{2,SVector{K,Int}} = (zeros(SVector{K,Int}), zeros(SVector{K,Int}))
+    kbloch::SVector{K,Float64} = zeros(SVector{K,Float64})  # [kx_bloch, ky_bloch, kz_bloch]
 
     # Material parameter arrays
     εₜarr::AP = create_param_array(P, grid.N, ncmp=Kₑₜ)  # filled with zeros
@@ -43,8 +43,8 @@ export complete_fields
     shp4oind::Vector{Shape{K,K²}} = Shape{K,K²}[]
     εind4oind::Vector{ParamInd} = ParamInd[]
     μind4oind::Vector{ParamInd} = ParamInd[]
-    ε4εind::Vector{S²Mat3{P}} = S²Mat3{P}[]
-    μ4μind::Vector{S²Mat3{P}} = S²Mat3{P}[]
+    ε4εind::Vector{SMatrix{3,3,P,9}} = SMatrix{3,3,P,9}[]
+    μ4μind::Vector{SMatrix{3,3,P,9}} = SMatrix{3,3,P,9}[]
 
     # Boolean flags indicating if the transverse E- and H-field dimensions are orthogonal to
     # the shape dimensions.  Used for material parameter smoothing in calc_matparams!().
@@ -67,13 +67,13 @@ Base.length(mdl::Model, ft::FieldType) = prod(size(mdl, ft))
 
 # Basic setters
 set_ωpml!(mdl::Model, ωpml::Number) = (mdl.ωpml = ωpml; nothing)
-set_boundft!(mdl::Model{K}, boundft::AbsVec{FieldType}) where {K} = (mdl.boundft = SVec{K}(boundft); nothing)
-set_Npml!(mdl::Model{K}, Npml::Tuple2{AbsVecInteger}) where {K} = (mdl.Npml = SVec{K}.(Npml); nothing)
-set_kbloch!(mdl::Model{K}, kbloch::AbsVecReal) where {K} = (mdl.kbloch = SVec{K}(kbloch); nothing)
+set_boundft!(mdl::Model{K}, boundft::AbstractVector{FieldType}) where {K} = (mdl.boundft = SVector{K}(boundft); nothing)
+set_Npml!(mdl::Model{K}, Npml::NTuple{2,AbstractVector{<:Integer}}) where {K} = (mdl.Npml = SVector{K}.(Npml); nothing)
+set_kbloch!(mdl::Model{K}, kbloch::AbstractVector{<:Real}) where {K} = (mdl.kbloch = SVector{K}(kbloch); nothing)
 
 create_e⁻ⁱᵏᴸ(mdl::Model{K}) where {K} =
     iszero(mdl.kbloch) ?
-        ones(SFloat{K}) :
+        ones(SVector{K,Float64}) :
         exp.(-im .* mdl.kbloch .* mdl.grid.L)
 
 # Main functions
@@ -96,7 +96,7 @@ function clear_objs!(mdl::Model)
 end
 
 MaxwellBase.add_obj!(
-    mdl::Model{K}, matname::String, shapes::AbsVec{<:Shape{K}};
+    mdl::Model{K}, matname::String, shapes::AbstractVector{<:Shape{K}};
     ε::AbstractMatParam=1.0, μ::AbstractMatParam=1.0
 ) where {K} =
     add_obj!(mdl, matname, ε=ε, μ=μ, tuple(shapes...))
@@ -137,8 +137,8 @@ function calc_matparams! end
 function complete_fields end
 
 function field2vec(
-    E::NTuple{Kₑ,AbsVecNumber{K}},
-    H::NTuple{Kₘ,AbsVecNumber{K}},
+    E::NTuple{Kₑ,AbstractArray{<:Number,K}},
+    H::NTuple{Kₘ,AbstractArray{<:Number,K}},
     mdl::Model{K,Kₑ,Kₘ}
 ) where {K,Kₑ,Kₘ}
     @unpack ft_eq, cmpₑₜ, cmpₘₜ, cmpfirst = mdl

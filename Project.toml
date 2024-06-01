@@ -6,22 +6,19 @@ authors = ["Wonseok Shin <wsshin97@gmail.com> and contributors"]
 version = "0.3.0"
 
 [deps]
-AbbreviatedTypes = "1766def0-c946-4dda-a59e-d0d07f8410f7"
 ArgCheck = "dce04be8-c92d-5529-be00-80e4d2c0e197"
 Arpack = "7d9fca2a-8960-54d3-9f78-7d1dccf2cb97"
-Dierckx = "39dd38d3-220a-591b-8e3c-4c3a8c710a94"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MaxwellBase = "7ddc1c72-b467-4b56-ac1e-188734e3cfa7"
 Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 SimpleConstants = "6ca440b6-64d6-4b6c-88af-e5d091cb43b1"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 VoxelwiseConstantMapping = "30c4ba4d-5c6d-4df8-9a6f-7ded98721337"
 
 [compat]
-AbbreviatedTypes = "0.3.4 - 0.9"
 ArgCheck = "2.1.0 - 2"
 Arpack = "0.5.3 - 0.9"
-Dierckx = "0.5.1 - 0.9"
 MaxwellBase = "0.2.0 - 0.9"
 Parameters = "0.12.3 - 0.19"
 Reexport = "1.0.0 - 1"

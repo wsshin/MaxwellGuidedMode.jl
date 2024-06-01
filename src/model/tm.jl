@@ -13,11 +13,11 @@ const ModelTM{P,AP} = Model{1,2,1, 1,1, 1,0, 1,3, P,AP}
 function ModelTM(grid::Grid; APtype::Type=Array{ComplexF,3})
     ft_eq = HH
 
-    cmpₑₜ = SInt(1)  # transverse E-field (1st component)
-    cmpₘₜ = SInt(2)  # transverse H-field (2nd component)
+    cmpₑₜ = SVector(1)  # transverse E-field (1st component)
+    cmpₘₜ = SVector(2)  # transverse H-field (2nd component)
 
-    cmpₑₗ = SInt(3)  # longitudinal E-field (3rd component)
-    cmpₘₗ = SInt()  # longitudinal H-field (no component)
+    cmpₑₗ = SVector(3)  # longitudinal E-field (3rd component)
+    cmpₘₗ = SVector{0,Int}()  # longitudinal H-field (no component)
 
     iseₜ˔shp = false
     ishₜ˔shp = true
@@ -80,12 +80,12 @@ end
 
 function complete_fields(
     β::Number,  # propagation constant
-    fₜ::AbsVecNumber,  # calculated transverse field Fₜ as column vector
+    fₜ::AbstractVector{<:Number},  # calculated transverse field Fₜ as column vector
     ft::FieldType,  # type of input field Fₜ
     ω::Number,
-    Ps::Tuple22{AbsMatNumber},
-    ∇̽s::Tuple22{AbsMatNumber},
-    πcmps::Tuple2{AbsMatNumber},
+    Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
+    ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
+    πcmps::NTuple{2,AbstractMatrix{<:Number}},
     mdl::ModelTM
 )
     # Calculate the transverse components of the complementary field.
@@ -109,8 +109,8 @@ end
 
 # See the field configurations in L10 - Eigenmode Analysis > Matrix equation formulation.
 function poynting(
-    E::Tuple2{AbsVecNumber},  # (E₁, E₃)
-    H::AbsVecNumber,  # H₂
+    E::NTuple{2,AbstractVector{<:Number}},  # (E₁, E₃)
+    H::AbstractVector{<:Number},  # H₂
     mdl::ModelTM
 )
     boundft = mdl.boundft
@@ -125,7 +125,7 @@ function poynting(
     dir₁ = 1
 
     # Calculate S₁.
-    m̂₁H₂ = ArrComplexF(undef, size(grid))  # vector
+    m̂₁H₂ = Array{ComplexF64}(undef, size(grid))  # vector
     interp_field!(m̂₁H₂, H₂, HH, dir₁, ∆l, ∆l⁻¹, boundft, isbloch)
     m̂₁H₂ .= -1 .* E₃ .* conj.(m̂₁H₂)
     S₁ = m̂₁H₂

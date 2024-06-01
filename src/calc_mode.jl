@@ -27,7 +27,7 @@ end
 function calc_mode(
     mdl::Model, ω::Real, βguess::Number;
     nmode::Int=1,  # mode number if fₜref is empty; number of modes to calculate otherwise
-    fₜref::AbsVecNumber=ComplexF[],  # reference field w.r.t. which optimal phase angle is calculated
+    fₜref::AbstractVector{<:Number}=ComplexF[],  # reference field w.r.t. which optimal phase angle is calculated
 )
     ## Create the eigenequation and solve it.
     Ps = create_paramops(mdl)

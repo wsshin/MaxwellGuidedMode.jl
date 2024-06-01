@@ -13,11 +13,11 @@ const ModelTE{P,AP} = Model{1,1,2, 1,1, 0,1, 1,3, P,AP}
 function ModelTE(grid::Grid; APtype::Type=Array{ComplexF,3})
     ft_eq = EE
 
-    cmpₑₜ = SInt(2)  # transverse E-field (2nd component)
-    cmpₘₜ = SInt(1)  # transverse H-field (1st component)
+    cmpₑₜ = SVector(2)  # transverse E-field (2nd component)
+    cmpₘₜ = SVector(1)  # transverse H-field (1st component)
 
-    cmpₑₗ = SInt()  # longitudinal E-field (no component)
-    cmpₘₗ = SInt(3)  # longitudinal H-field (3rd component)
+    cmpₑₗ = SVector{0,Int}()  # longitudinal E-field (no component)
+    cmpₘₗ = SVector(3)  # longitudinal H-field (3rd component)
 
     iseₜ˔shp = true
     ishₜ˔shp = false
@@ -80,12 +80,12 @@ end
 
 function complete_fields(
     β::Number,  # propagation constant
-    fₜ::AbsVecNumber,  # calculated transverse field Fₜ as column vector
+    fₜ::AbstractVector{<:Number},  # calculated transverse field Fₜ as column vector
     ft::FieldType,  # type of input field Fₜ
     ω::Number,
-    Ps::Tuple22{AbsMatNumber},
-    ∇̽s::Tuple22{AbsMatNumber},
-    πcmps::Tuple2{AbsMatNumber},
+    Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
+    ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
+    πcmps::NTuple{2,AbstractMatrix{<:Number}},
     mdl::ModelTE
 )
     # Calculate the transverse components of the complementary field.
@@ -109,8 +109,8 @@ end
 
 # See the field configurations in L10 - Eigenmode Analysis > Matrix equation formulation.
 function poynting(
-    E::AbsVecNumber,  # E₂
-    H::Tuple2{AbsVecNumber},  # (H₁, H₃)
+    E::AbstractVector{<:Number},  # E₂
+    H::NTuple{2,AbstractVector{<:Number}},  # (H₁, H₃)
     mdl::ModelTE
 )
     boundft = mdl.boundft
@@ -124,15 +124,15 @@ function poynting(
 
     dir₁ = 1
 
-    Ftemp = ArrComplexF(undef, size(grid))  # vector; temporary storage
+    Ftemp = Array{ComplexF64}(undef, size(grid))  # vector; temporary storage
 
     # Calculate S₁.
-    S₁ = ArrComplexF(undef, size(grid))  # vector
+    S₁ = Array{ComplexF64}(undef, size(grid))  # vector
     m̂₁H₃ = Ftemp; interp_field!(m̂₁H₃, H₃, HH, dir₁, ∆l, ∆l⁻¹, boundft, isbloch)
     S₁ .= E₂ .* conj.(m̂₁H₃)
 
     # Calculate S₃.
-    S₃ = ArrComplexF(undef, size(grid))  # vector
+    S₃ = Array{ComplexF64}(undef, size(grid))  # vector
     S₃₋ = Ftemp; S₃₋ .= E₂ .* conj.(H₁)  # real array located at E₂
     interp_field!(S₃, S₃₋, EE, dir₁, ∆l, ∆l⁻¹, boundft, isbloch, α=-1)
 

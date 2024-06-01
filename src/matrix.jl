@@ -70,8 +70,8 @@ end
 function create_πcmps(mdl::Model{K}) where {K}
     @unpack grid, cmpₑₜ, cmpₘₜ, cmpfirst = mdl
 
-    cmpperm = reverse(SVec(ntuple(identity, Val(K))))
-    scale₀ = SFloat(1,-1)
+    cmpperm = reverse(SVector{K}(1:K))
+    scale₀ = SVector(1,-1)
 
     πcmpₑ = create_πcmp(grid.N, cmpperm; scale=scale₀[cmpₑₜ], cmpfirst)
     πcmpₘ = create_πcmp(grid.N, cmpperm; scale=scale₀[cmpₘₜ], cmpfirst)
@@ -79,10 +79,10 @@ function create_πcmps(mdl::Model{K}) where {K}
     return πcmpₑ, πcmpₘ
 end
 
-create_ⅈhₗ4eₜ(ω, Ps::Tuple22{AbsMatNumber}, ∇̽s::Tuple22{AbsMatNumber}) = create_ⅈf′ₗ4fₜ(EE, ω, Ps, ∇̽s)
-create_ⅈeₗ4hₜ(ω, Ps::Tuple22{AbsMatNumber}, ∇̽s::Tuple22{AbsMatNumber}) = create_ⅈf′ₗ4fₜ(HH, ω, Ps, ∇̽s)
+create_ⅈhₗ4eₜ(ω, Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}}, ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}}) = create_ⅈf′ₗ4fₜ(EE, ω, Ps, ∇̽s)
+create_ⅈeₗ4hₜ(ω, Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}}, ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}}) = create_ⅈf′ₗ4fₜ(HH, ω, Ps, ∇̽s)
 
-create_ⅈf′ₗ4fₜ(ft, ω, Ps::Tuple22{AbsMatNumber}, ∇̽s::Tuple22{AbsMatNumber}) =
+create_ⅈf′ₗ4fₜ(ft, ω, Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}}, ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}}) =
     create_ⅈf′ₗ4fₜ(ft, ω, Ps[2], ∇̽s[1])
 
 # Create the operator that generates im * F′ₗ from Fₜ, where F′ is the field complementary
@@ -90,8 +90,8 @@ create_ⅈf′ₗ4fₜ(ft, ω, Ps::Tuple22{AbsMatNumber}, ∇̽s::Tuple22{AbsMat
 function create_ⅈf′ₗ4fₜ(
     ft::FieldType,  # type of input field Fₜ, not output field F′ₗ
     ω::Number,
-    Pₗs::Tuple2{AbsMatNumber},
-    ∇̽ₜs::Tuple2{AbsMatNumber}
+    Pₗs::NTuple{2,AbstractMatrix{<:Number}},
+    ∇̽ₜs::NTuple{2,AbstractMatrix{<:Number}}
 )
     nft = Int(ft)
     nft′ = alter(nft)
@@ -117,9 +117,9 @@ create_βf′ₜ4fₜ(ft, ω, Ps, ∇̽s, πcmps) = sum(create_βf′ₜ4fₜ_co
 function create_βf′ₜ4fₜ_comps(
     ft::FieldType,  # type of input field Fₜ, not output field F′ₗ
     ω::Number,
-    Ps::Tuple22{AbsMatNumber},
-    ∇̽s::Tuple22{AbsMatNumber},
-    πcmps::Tuple2{AbsMatNumber}
+    Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
+    ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
+    πcmps::NTuple{2,AbstractMatrix{<:Number}}
 )
     nft = Int(ft)
     nft′ = alter(nft)
@@ -148,9 +148,9 @@ end
 function create_A(
     ft::FieldType,  # type of input field Fₜ
     ω::Number,
-    Ps::Tuple22{AbsMatNumber},
-    ∇̽s::Tuple22{AbsMatNumber},
-    πcmps::Tuple2{AbsMatNumber}
+    Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
+    ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
+    πcmps::NTuple{2,AbstractMatrix{<:Number}}
 )
     ft′ = alter(ft)
 

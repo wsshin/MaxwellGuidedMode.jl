@@ -9,11 +9,11 @@ const ModelFull{P,AP} = Model{2,3,3, 2,2, 1,1, 4,4, P,AP}
 function ModelFull(grid::Grid; APtype::Type=Array{ComplexF,4})
     ft_eq = EE
 
-    cmpₑₜ = SInt(1,2)  # transverse E-field (1st and 2nd components)
-    cmpₘₜ = SInt(1,2)  # transverse H-field (1st and 2nd components)
+    cmpₑₜ = SVector(1,2)  # transverse E-field (1st and 2nd components)
+    cmpₘₜ = SVector(1,2)  # transverse H-field (1st and 2nd components)
 
-    cmpₑₗ = SInt(3)  # longitudinal E-field (3rd component)
-    cmpₘₗ = SInt(3)  # longitudinal H-field (3rd component)
+    cmpₑₗ = SVector(3)  # longitudinal E-field (3rd component)
+    cmpₘₗ = SVector(3)  # longitudinal H-field (3rd component)
 
     iseₜ˔shp = false
     ishₜ˔shp = false
@@ -90,12 +90,12 @@ end
 
 function complete_fields(
     β::Number,  # propagation constant
-    fₜ::AbsVecNumber,  # calculated transverse field Fₜ as column vector
+    fₜ::AbstractVector{<:Number},  # calculated transverse field Fₜ as column vector
     ft::FieldType,  # type of input field Fₜ
     ω::Number,
-    Ps::Tuple22{AbsMatNumber},
-    ∇̽s::Tuple22{AbsMatNumber},
-    πcmps::Tuple2{AbsMatNumber},
+    Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
+    ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
+    πcmps::NTuple{2,AbstractMatrix{<:Number}},
     mdl::ModelFull
 )
     ft′ = alter(ft)
@@ -142,8 +142,8 @@ end
 
 # See the field configurations in L10 - Eigenmode Analysis > Matrix equation formulation.
 function poynting(
-    E::Tuple3{AbsMatNumber},  # (E₁, E₂, E₃)
-    H::Tuple3{AbsMatNumber},  # (H₁, H₂, H₃)
+    E::NTuple{3,AbstractMatrix{<:Number}},  # (E₁, E₂, E₃)
+    H::NTuple{3,AbstractMatrix{<:Number}},  # (H₁, H₂, H₃)
     mdl::ModelFull
 )
     boundft = mdl.boundft
@@ -157,14 +157,14 @@ function poynting(
 
     dir₁, dir₂ = 1, 2
 
-    Ftemp = ArrComplexF(undef, size(grid))  # matrix; temporary storage
+    Ftemp = Array{ComplexF64}(undef, size(grid))  # matrix; temporary storage
 
     # Below, note that the grid is 2D Yee's grid in the plane of the directions 1 and 2.
     # The field components in the direction 3 are defined on this plane, and their locations
     # are the projection of the direction-3 components of 3D Yee's grid onto the plane.
 
     # Calculate S₁.
-    S₁ = ArrComplexF(undef, size(grid))  # matrix
+    S₁ = Array{ComplexF64}(undef, size(grid))  # matrix
 
     m̂₁H₃ = Ftemp; interp_field!(m̂₁H₃, H₃, HH, dir₁, ∆l, ∆l⁻¹, boundft, isbloch)  # intepolate H₃ at E₂-locations
     S₁ .= E₂ .* conj.(m̂₁H₃)  # E₂H₃ evaluated at centers of edges normal to direction 1
@@ -176,7 +176,7 @@ function poynting(
     interp_field!(S₁, S₁₋, EE, dir₂, ∆l, ∆l⁻¹, boundft, isbloch, α=-1, overwrite=false)  # interpolate S₁₋ at centers of edges normal to direction 1
 
     # Calculate S₂.
-    S₂ = ArrComplexF(undef, size(grid))  # matrix
+    S₂ = Array{ComplexF64}(undef, size(grid))  # matrix
 
     m̂₂H₃ = Ftemp; interp_field!(m̂₂H₃, H₃, HH, dir₂, ∆l, ∆l⁻¹, boundft, isbloch)  # intepolate H₃ at E₁-locations
     S₂ .= -1 .* E₁ .* conj.(m̂₂H₃)  # E₁H₃ evaluated at centers of edges normal to direction 2
@@ -188,7 +188,7 @@ function poynting(
     interp_field!(S₂, S₂₊, EE, dir₁, ∆l, ∆l⁻¹, boundft, isbloch, overwrite=false)  # interpolate S₂₊ at centers of edges normal to direction 2
 
     # Calculate S₃.
-    S₃ = ArrComplexF(undef, size(grid))  # matrix
+    S₃ = Array{ComplexF64}(undef, size(grid))  # matrix
 
     S₃₊ = Ftemp; S₃₊ .= E₁ .* conj.(H₂)  # E₁ and H₂ are already co-located
     interp_field!(S₃, S₃₊, EE, dir₂, ∆l, ∆l⁻¹, boundft, isbloch)  # S₃₊ interpolated at centers of pixels
