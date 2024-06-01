@@ -136,6 +136,7 @@ end
 function calc_matparams! end
 function complete_fields end
 
+# This function is not used currently; not sure if this will be needed.
 function field2vec(
     E::NTuple{Kₑ,AbstractArray{<:Number,K}},
     H::NTuple{Kₘ,AbstractArray{<:Number,K}},

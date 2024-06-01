@@ -56,5 +56,5 @@ function calc_mode(
     E, H = complete_fields(β, fₜ, ft_eq, ω, Ps, ∇̽s, πcmps, mdl)
     normalize!(E, H, mdl)
 
-    return (; ω, β, E, H, fₜ)
+    return (; ω, β, E, H, fₜ)  # not ideal, because transverse components of E or H already contain fₜ
 end

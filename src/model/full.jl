@@ -105,8 +105,8 @@ function complete_fields(
     f′ₜ = (βf′ₜ4fₜ * fₜ) ./ β
 
     # Calculate the longitudinal components of the main and complementary fields.
-    ⅈf′ₗ4fₜ = create_ⅈf′ₗ4fₜ(ft, ω, Ps, ∇̽s)
-    ⅈfₗ4f′ₜ = create_ⅈf′ₗ4fₜ(ft′, ω, Ps, ∇̽s)
+    ⅈf′ₗ4fₜ = create_ⅈf′ₗ4fₜ(ft, ω, Ps, ∇̽s)  # matrix
+    ⅈfₗ4f′ₜ = create_ⅈf′ₗ4fₜ(ft′, ω, Ps, ∇̽s)  # matrix
 
     fₗ = (ⅈfₗ4f′ₜ * f′ₜ) ./ im
     f′ₗ = (ⅈf′ₗ4fₜ * fₜ) ./ im

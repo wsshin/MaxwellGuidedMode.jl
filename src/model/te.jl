@@ -95,7 +95,7 @@ function complete_fields(
     eₜ, hₜ = ft==EE ? (fₜ,f′ₜ) : (f′ₜ,fₜ)
 
     # Calculate the longitudinal component of the H-field.
-    ⅈhₗ4eₜ = create_ⅈhₗ4eₜ(ω, Ps, ∇̽s)
+    ⅈhₗ4eₜ = create_ⅈhₗ4eₜ(ω, Ps, ∇̽s)  # matrix
     hₗ = (ⅈhₗ4eₜ * eₜ) ./ im
 
     # Take the Cartesian components of the fields and reshape them into arrays.
