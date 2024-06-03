@@ -48,7 +48,16 @@ export poynting, powerₗ
 # products and averaging.  So, the users must make sure to know where their vector fields
 # are defined.  In the future, I may need to provide some wrapper functions that help the
 # users on this regard.
-function poynting end
+function poynting(
+    E::NTuple{Kₑ,AbstractArray{<:Number,K}},
+    H::NTuple{Kₘ,AbstractArray{<:Number,K}},
+    mdl::Model{K,Kₑ,Kₘ}
+) where {K,Kₑ,Kₘ}
+    S = poynting_complex(E, H, mdl)
+    add_cc!.(S)
+
+    return S
+end
 
 # Used in poynting().
 function interp_field!(

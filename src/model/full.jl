@@ -141,7 +141,7 @@ function complete_fields(
 end
 
 # See the field configurations in L10 - Eigenmode Analysis > Matrix equation formulation.
-function poynting(
+function poynting_complex(
     E::NTuple{3,AbstractMatrix{<:Number}},  # (E₁, E₂, E₃)
     H::NTuple{3,AbstractMatrix{<:Number}},  # (H₁, H₂, H₃)
     mdl::ModelFull

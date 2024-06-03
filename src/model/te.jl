@@ -108,8 +108,8 @@ function complete_fields(
 end
 
 # See the field configurations in L10 - Eigenmode Analysis > Matrix equation formulation.
-function poynting(
-    E::AbstractVector{<:Number},  # E₂
+function poynting_complex(
+    E::NTuple{1,AbstractVector{<:Number}},  # (E₂)
     H::NTuple{2,AbstractVector{<:Number}},  # (H₁, H₃)
     mdl::ModelTE
 )

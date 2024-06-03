@@ -108,9 +108,9 @@ function complete_fields(
 end
 
 # See the field configurations in L10 - Eigenmode Analysis > Matrix equation formulation.
-function poynting(
+function poynting_complex(
     E::NTuple{2,AbstractVector{<:Number}},  # (E₁, E₃)
-    H::AbstractVector{<:Number},  # H₂
+    H::NTuple{1,AbstractVector{<:Number}},  # (H₂)
     mdl::ModelTM
 )
     boundft = mdl.boundft

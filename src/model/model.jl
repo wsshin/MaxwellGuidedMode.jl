@@ -6,6 +6,7 @@ export complete_fields
 # Implement the following functions for each specific Model.
 function calc_matparams! end
 function complete_fields end
+function poynting_complex end
 
 # Do not export Model; qualify it with the package name MaxwellFDFD, because I would have
 # similar types in other packages such as MaxwellSALT and MaxwellGuide.
