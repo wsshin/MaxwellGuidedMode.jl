@@ -98,21 +98,26 @@ function powerₗ_complex(
     return Pₗ_complex
 end
 
+# Normalize the fields such that ∫∫da ẑ⋅E×conj(H) = 1/2.
+# See RN - POWER > [Jun/02/2024] Mode coefficients calculation
 function LinearAlgebra.normalize!(
     E::NTuple{Kₑ,AbstractArray{<:Number,K}},
     H::NTuple{Kₘ,AbstractArray{<:Number,K}},
     mdl::Model{K,Kₑ,Kₘ}
 ) where {K,Kₑ,Kₘ}
-    Pz = powerₗ(E, H, mdl)
-    sqrtPz = √Pz
+    Pₗ_complex = powerₗ_complex(E, H, mdl)
+    denom = √(2Pₗ_complex)
 
     for k = 1:Kₑ
-        E[k] ./= sqrtPz
+        E[k] ./= denom
     end
 
     for k = 1:Kₘ
-        H[k] ./= sqrtPz
+        H[k] ./= denom
     end
+
+    # Now, powerₗ_complex(E, H, mdl) returns 1/2.
+    # See prototype/model/proto_full.m for example.
 
     return nothing
 end
