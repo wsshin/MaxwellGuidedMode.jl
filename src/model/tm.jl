@@ -104,7 +104,7 @@ function complete_fields(
     E₃ = reshape(eₗ, sz_grid)
     H₂ = reshape(hₜ, sz_grid)
 
-    return (E=(E₁, E₃), H=H₂)
+    return (E=(E₁, E₃), H=tuple(H₂))
 end
 
 # See the field configurations in L10 - Eigenmode Analysis > Matrix equation formulation.
@@ -120,7 +120,7 @@ function poynting_complex(
     ∆l, ∆l⁻¹ = create_∆ls(grid, boundft)
 
     E₁, E₃ = E
-    H₂ = H
+    H₂ = only(H)
 
     dir₁ = 1
 
