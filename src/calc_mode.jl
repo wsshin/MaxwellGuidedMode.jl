@@ -46,7 +46,11 @@ function calc_mode(
     fₜ = f[:,ind_mode]
     β = .√β²[ind_mode]
 
-    # See RN - NLSE > December 12, 2021
+    # See RN - NLSE > December 12, 2021 for the explanation of the following procedure.
+    #
+    # I was wondering if the subsequenty normalization messes up the phase adjusted here.
+    # However, the normalization is division by a real number, so it does not change the
+    # phase of the fields at all.
     if length(fₜref)==length(fₜ)
         α = fₜref⋅fₜ
         θ = -angle(α)
