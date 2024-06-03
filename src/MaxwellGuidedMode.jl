@@ -11,7 +11,7 @@ using Arpack
 using LinearAlgebra: normalize!
 
 include("model/model.jl")
-include("poynting.jl")
+include("power.jl")
 include("matrix.jl")
 include("calc_mode.jl")
 
