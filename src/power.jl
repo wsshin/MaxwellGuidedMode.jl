@@ -61,8 +61,8 @@ end
 
 # Used in poynting().
 function interp_field!(
-    G::AbstractArray{ComplexF64,K},  # where averaged fields are stored
-    F::AbstractArray{ComplexF64,K},  # field to average
+    Gᵤ::AbstractArray{ComplexF64,K},  # where averaged fields are stored
+    Fᵤ::AbstractArray{ComplexF64,K},  # field to average
     ft::FieldType,  # type of field to average
     nw::Int,  # direction of averaging
     ∆l::NTuple{2,NTuple{K,Vector{Float64}}},
@@ -73,7 +73,7 @@ function interp_field!(
 ) where {K}
     nft = Int(ft); nft′ = alter(nft)
     isfwd = boundft[nw]==ft
-    apply_m̂!(G, F, nw, isfwd, ∆l[nft][nw], ∆l⁻¹[nft′][nw], isbloch[nw]; kwargs...)
+    apply_m̂!(Gᵤ, Fᵤ, nw, isfwd, ∆l[nft][nw], ∆l⁻¹[nft′][nw], isbloch[nw]; kwargs...)
 
     return nothing
 end
