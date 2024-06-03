@@ -81,6 +81,8 @@ end
 # Calculate the power along the longitudinal direction.
 powerₗ(E, H, mdl) = add_cc(powerₗ_complex(E, H, mdl))
 
+# This is needed for calculating the coefficient of the mth mode in a wave with E:
+# Cₘ = ∫∫da ẑ⋅(E×conj(hₘ)) / ∫∫da ẑ⋅(eₘ×conj(hₘ)).
 function powerₗ_complex(
     E::NTuple{Kₑ,AbstractArray{<:Number,K}},
     H::NTuple{Kₘ,AbstractArray{<:Number,K}},
@@ -105,8 +107,8 @@ function LinearAlgebra.normalize!(
     H::NTuple{Kₘ,AbstractArray{<:Number,K}},
     mdl::Model{K,Kₑ,Kₘ}
 ) where {K,Kₑ,Kₘ}
-    Pₗ_complex = powerₗ_complex(E, H, mdl)
-    denom = √(2Pₗ_complex)
+    Pₗ = powerₗ(E, H, mdl)
+    denom = √Pₗ
 
     for k = 1:Kₑ
         E[k] ./= denom
@@ -116,7 +118,7 @@ function LinearAlgebra.normalize!(
         H[k] ./= denom
     end
 
-    # Now, powerₗ_complex(E, H, mdl) returns 1/2.
+    # Now, powerₗ_complex(E, H, mdl) returns 1/2 if the waveguide is material-lossless.
     # See prototype/model/proto_full.m for example.
 
     return nothing
