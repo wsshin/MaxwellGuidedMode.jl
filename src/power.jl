@@ -79,21 +79,23 @@ function interp_field!(
 end
 
 # Calculate the power along the longitudinal direction.
-function powerₗ(
+powerₗ(E, H, mdl) = add_cc(powerₗ_complex(E, H, mdl))
+
+function powerₗ_complex(
     E::NTuple{Kₑ,AbstractArray{<:Number,K}},
     H::NTuple{Kₘ,AbstractArray{<:Number,K}},
     mdl::Model{K,Kₑ,Kₘ}
 ) where {K,Kₑ,Kₘ}
-    S = poynting(E, H, mdl)
-    Sz = S[end]
+    S_complex = poynting_complex(E, H, mdl)
+    Sₗ_complex = S_complex[end]
 
     gtₑ = ft2gt.(HH, mdl.boundft)
     lvxl = t_ind(mdl.grid.ghosted.lg, gtₑ)  # locations of x-normal edges of E-field pixels surrounding Sz
 
-    vc = VoxelwiseConstant(Sz, lvxl)
-    Pz = integral(vc)
+    vc = VoxelwiseConstant(Sₗ_complex, lvxl)
+    Pₗ_complex = integral(vc)
 
-    return Pz
+    return Pₗ_complex
 end
 
 function LinearAlgebra.normalize!(
