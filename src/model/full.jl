@@ -6,7 +6,7 @@
 const ModelFull{P,AP} = Model{2,3,3, 2,2, 1,1, 4,4, P,AP}
 
 # Convenience constructor
-function ModelFull(grid::Grid; APtype::Type=Array{ComplexF,4})
+function ModelFull(grid::Grid; APtype::Type=Array{ComplexF64,4})
     ft_eq = EE
 
     cmpₑₜ = SVector(1,2)  # transverse E-field (1st and 2nd components)

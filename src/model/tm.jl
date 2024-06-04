@@ -10,7 +10,7 @@
 const ModelTM{P,AP} = Model{1,2,1, 1,1, 1,0, 1,3, P,AP}
 
 # Convenience constructor
-function ModelTM(grid::Grid; APtype::Type=Array{ComplexF,3})
+function ModelTM(grid::Grid; APtype::Type=Array{ComplexF64,3})
     ft_eq = HH
 
     cmpₑₜ = SVector(1)  # transverse E-field (1st component)
