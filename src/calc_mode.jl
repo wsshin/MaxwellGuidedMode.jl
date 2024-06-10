@@ -41,7 +41,7 @@ function calc_mode(
     β², f = eigs(A, nev=nmode, sigma=βguess^2)
     eltype(A)<:Real && (β² = real(β²))
 
-    ind_mode = isempty(fₜref) ? nmode : findmax(abs.(fₜref⋅f)[:])[2]
+    ind_mode = isempty(fₜref) ? nmode : findmax(abs, transpose(fₜref'f))[2]  # fₜref⋅f doesn't work for matrix f
 
     fₜ = f[:,ind_mode]
     β = .√β²[ind_mode]
