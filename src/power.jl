@@ -102,7 +102,7 @@ end
 
 # Normalize the fields such that ∫∫da ẑ⋅E×conj(H) = 1/2.
 # See RN - POWER > [Jun/02/2024] Mode coefficients calculation
-function LinearAlgebra.normalize!(
+function normalize!(
     E::NTuple{Kₑ,AbstractArray{<:Number,K}},
     H::NTuple{Kₘ,AbstractArray{<:Number,K}},
     mdl::Model{K,Kₑ,Kₘ}

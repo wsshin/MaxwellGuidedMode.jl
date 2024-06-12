@@ -8,7 +8,8 @@ using StaticArrays
 using Parameters
 using ArgCheck
 using Arpack
-using LinearAlgebra: normalize!
+
+import LinearAlgebra: normalize!
 
 include("model/model.jl")
 include("power.jl")
