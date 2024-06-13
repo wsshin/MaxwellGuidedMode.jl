@@ -102,8 +102,8 @@ println("Hx_max/Hmax = $(Hx_max/Hmax), Hy_max/Hmax = $(Hy_max/Hmax), Hz_max/Hmax
 # ticks for the positive-end boundaries in x and y.
 nX, nY = 1, 2
 
-gₑ = ft2gt.(mdl.boundft, EE)
-gₘ = ft2gt.(mdl.boundft, HH)
+gₑ = gt4ft.(mdl.boundft, EE)
+gₘ = gt4ft.(mdl.boundft, HH)
 
 gₑx = gₑ[nX]
 gₑy = gₑ[nY]

@@ -91,7 +91,7 @@ function powerₗ_complex(
     S_complex = poynting_complex(E, H, mdl)
     Sₗ_complex = S_complex[end]
 
-    gtₑ = ft2gt.(HH, mdl.boundft)
+    gtₑ = gt4ft.(HH, mdl.boundft)
     lvxl = t_ind(mdl.grid.ghosted.lg, gtₑ)  # locations of x-normal edges of E-field pixels surrounding Sz
 
     vc = VoxelwiseConstant(Sₗ_complex, lvxl)

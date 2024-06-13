@@ -9,8 +9,8 @@ function create_stretched_∆ls(mdl::Model)
     s∆l = create_stretched_∆l(ωpml, grid, Npml)
     s∆l⁻¹ = invert_∆l(s∆l)
 
-    gtₑ = ft2gt.(EE, boundft)
-    gtₘ = ft2gt.(HH, boundft)
+    gtₑ = gt4ft.(EE, boundft)
+    gtₘ = gt4ft.(HH, boundft)
 
     s∆lₑ = t_ind(s∆l, gtₑ)  # stretched ∆l's centered at E-field plane locations
     s∆lₘ = t_ind(s∆l, gtₘ)  # stretched ∆l's centered at H-field plane locations

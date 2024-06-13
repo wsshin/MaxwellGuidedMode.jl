@@ -37,8 +37,8 @@ function calc_matparams!(mdl::ModelTE)
     @unpack isbloch, N, l, σ, ghosted = grid
     @unpack lg, τlg, ∆τ = ghosted
 
-    gtₑ = ft2gt.(EE,boundft)
-    gtₘ = ft2gt.(HH,boundft)
+    gtₑ = gt4ft.(EE,boundft)
+    gtₘ = gt4ft.(HH,boundft)
 
     εₜ4εind = sub_matprm4pind(ε4εind, cmpₑₜ)
     μₜ4μind = sub_matprm4pind(μ4μind, cmpₘₜ)

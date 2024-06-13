@@ -71,8 +71,8 @@ println("Ex_max/Emax = $(Ex_max/Emax), Ez_max/Emax = $(Ez_max/Emax)")
 ## Plot the solution.
 nX = 1
 
-gtₑ = ft2gt.(mdl.boundft[nX], EE)
-gtₘ = ft2gt.(mdl.boundft[nX], HH)
+gtₑ = gt4ft.(mdl.boundft[nX], EE)
+gtₘ = gt4ft.(mdl.boundft[nX], HH)
 
 xₑ = grid.l[Int(gtₑ)][nX]
 xₘ = grid.l[Int(gtₘ)][nX]

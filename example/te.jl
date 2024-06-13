@@ -71,8 +71,8 @@ println("Hx_max/Hmax = $(Hx_max/Hmax), Hz_max/Hmax = $(Hz_max/Hmax)")
 ## Plot the solution.
 nX = 1
 
-gtₑ = ft2gt.(mdl.boundft[nX], EE)
-gtₘ = ft2gt.(mdl.boundft[nX], HH)
+gtₑ = gt4ft.(mdl.boundft[nX], EE)
+gtₘ = gt4ft.(mdl.boundft[nX], HH)
 
 xₑ = grid.l[Int(gtₑ)][nX]
 xₘ = grid.l[Int(gtₘ)][nX]
