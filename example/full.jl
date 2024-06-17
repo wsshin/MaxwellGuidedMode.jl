@@ -44,8 +44,8 @@ Ps = create_paramops(mdl)
 ∇̽s = create_curls(mdl)
 πcmps = create_πcmps(mdl)
 
-# A, A₁₁, A₁₂, A₂₁, A₂₂ = create_A(HH, ω, Ps, ∇̽s, πcmps)
-A = create_A(EE, ω, Ps, ∇̽s, πcmps)
+# A, A₁₁, A₁₂, A₂₁, A₂₂ = create_A(Hfield(), ω, Ps, ∇̽s, πcmps)
+A = create_A(Efield(), ω, Ps, ∇̽s, πcmps)
 @show eltype(A)<:Real  # isreal(A) can be true even if eltype(A) <: Complex if imaginary part is zero; isreal(A) is also very slow because it tests all entries
 βguess = 2π * ncore / λ
 # Fguess = zeros(2, N...)
@@ -64,7 +64,7 @@ k = 1
 eₜ = e[:,k]
 β = .√β²[k]
 
-Etot, Htot = complete_fields(β, eₜ, EE, ω, Ps, ∇̽s, πcmps, mdl)
+Etot, Htot = complete_fields(β, eₜ, Efield(), ω, Ps, ∇̽s, πcmps, mdl)
 normalize!(Etot, Htot, mdl)
 
 Pₗ_complex = MaxwellGuidedMode.powerₗ_complex(Etot, Htot, mdl)
@@ -102,8 +102,8 @@ println("Hx_max/Hmax = $(Hx_max/Hmax), Hy_max/Hmax = $(Hy_max/Hmax), Hz_max/Hmax
 # ticks for the positive-end boundaries in x and y.
 nX, nY = 1, 2
 
-gₑ = gt4ft.(mdl.boundft, EE)
-gₘ = gt4ft.(mdl.boundft, HH)
+gₑ = gt4ft.(mdl.boundft, Efield())
+gₘ = gt4ft.(mdl.boundft, Hfield())
 
 gₑx = gₑ[nX]
 gₑy = gₑ[nY]

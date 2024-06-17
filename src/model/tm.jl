@@ -11,7 +11,7 @@ const ModelTM{P,AP} = Model{1,2,1, 1,1, 1,0, 1,3, P,AP}
 
 # Convenience constructor
 function ModelTM(grid::Grid; APtype::Type=Array{ComplexF64,3})
-    ft_eq = HH
+    ft_eq = Hfield()
 
     cmpₑₜ = SVector(1)  # transverse E-field (1st component)
     cmpₘₜ = SVector(2)  # transverse H-field (2nd component)
@@ -37,8 +37,8 @@ function calc_matparams!(mdl::ModelTM)
     @unpack isbloch, N, l, σ, ghosted = grid
     @unpack lg, τlg, ∆τ = ghosted
 
-    gtₑ = gt4ft.(EE,boundft)
-    gtₘ = gt4ft.(HH,boundft)
+    gtₑ = gt4ft.(Efield(),boundft)
+    gtₘ = gt4ft.(Hfield(),boundft)
 
     εₜ4εind = sub_matprm4pind(ε4εind, cmpₑₜ)
     μₜ4μind = sub_matprm4pind(μ4μind, cmpₘₜ)
@@ -81,7 +81,7 @@ end
 function complete_fields(
     β::Number,  # propagation constant
     fₜ::AbstractVector{<:Number},  # calculated transverse field Fₜ as column vector
-    ft::FieldType,  # type of input field Fₜ
+    ft::AbstractFieldType,  # type of input field Fₜ
     ω::Number,
     Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
     ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
@@ -92,7 +92,7 @@ function complete_fields(
     βf′ₜ4fₜ = create_βf′ₜ4fₜ(ft, ω, Ps, ∇̽s, πcmps)
     f′ₜ = (βf′ₜ4fₜ * fₜ) ./ β
 
-    eₜ, hₜ = ft==EE ? (fₜ,f′ₜ) : (f′ₜ,fₜ)
+    eₜ, hₜ = ft==Efield() ? (fₜ,f′ₜ) : (f′ₜ,fₜ)
 
     # Calculate the longitudinal component of the E-field.
     ⅈeₗ4hₜ = create_ⅈeₗ4hₜ(ω, Ps, ∇̽s)  # matrix
@@ -126,7 +126,7 @@ function poynting_complex(
 
     # Calculate S₁.
     m̂₁H₂ = Array{ComplexF64}(undef, size(grid))  # vector
-    interp_field!(m̂₁H₂, H₂, HH, dir₁, ∆l, ∆l⁻¹, boundft, isbloch)
+    interp_field!(m̂₁H₂, H₂, Hfield(), dir₁, ∆l, ∆l⁻¹, boundft, isbloch)
     m̂₁H₂ .= -1 .* E₃ .* conj.(m̂₁H₂)
     S₁ = m̂₁H₂
 

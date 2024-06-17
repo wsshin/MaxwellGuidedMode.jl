@@ -40,7 +40,7 @@ Ps = create_paramops(mdl)
 ∇̽s = create_curls(mdl)
 πcmps = create_πcmps(mdl)
 
-A = create_A(HH, ω, Ps, ∇̽s, πcmps)
+A = create_A(Hfield(), ω, Ps, ∇̽s, πcmps)
 @show eltype(A)<:Real  # isreal(A) can be true even if eltype(A) <: Complex if imaginary part is zero; isreal(A) is also very slow because it tests all entries
 βguess = 2π * ncore / λ
 
@@ -56,7 +56,7 @@ k = 1
 hₜ = h[:,k]
 β = .√β²[k]
 
-Etot, Htot = complete_fields(β, hₜ, HH, ω, Ps, ∇̽s, πcmps, mdl)
+Etot, Htot = complete_fields(β, hₜ, Hfield(), ω, Ps, ∇̽s, πcmps, mdl)
 Ex, Ez = Etot
 Hy = only(Htot)
 
@@ -71,8 +71,8 @@ println("Ex_max/Emax = $(Ex_max/Emax), Ez_max/Emax = $(Ez_max/Emax)")
 ## Plot the solution.
 nX = 1
 
-gtₑ = gt4ft.(mdl.boundft[nX], EE)
-gtₘ = gt4ft.(mdl.boundft[nX], HH)
+gtₑ = gt4ft.(mdl.boundft[nX], Efield())
+gtₘ = gt4ft.(mdl.boundft[nX], Hfield())
 
 xₑ = grid.l[Int(gtₑ)][nX]
 xₘ = grid.l[Int(gtₘ)][nX]

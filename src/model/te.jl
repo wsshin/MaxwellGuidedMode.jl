@@ -11,7 +11,7 @@ const ModelTE{P,AP} = Model{1,1,2, 1,1, 0,1, 1,3, P,AP}
 
 # Convenience constructor
 function ModelTE(grid::Grid; APtype::Type=Array{ComplexF64,3})
-    ft_eq = EE
+    ft_eq = Efield()
 
     cmpₑₜ = SVector(2)  # transverse E-field (2nd component)
     cmpₘₜ = SVector(1)  # transverse H-field (1st component)
@@ -37,8 +37,8 @@ function calc_matparams!(mdl::ModelTE)
     @unpack isbloch, N, l, σ, ghosted = grid
     @unpack lg, τlg, ∆τ = ghosted
 
-    gtₑ = gt4ft.(EE,boundft)
-    gtₘ = gt4ft.(HH,boundft)
+    gtₑ = gt4ft.(Efield(),boundft)
+    gtₘ = gt4ft.(Hfield(),boundft)
 
     εₜ4εind = sub_matprm4pind(ε4εind, cmpₑₜ)
     μₜ4μind = sub_matprm4pind(μ4μind, cmpₘₜ)
@@ -81,7 +81,7 @@ end
 function complete_fields(
     β::Number,  # propagation constant
     fₜ::AbstractVector{<:Number},  # calculated transverse field Fₜ as column vector
-    ft::FieldType,  # type of input field Fₜ
+    ft::AbstractFieldType,  # type of input field Fₜ
     ω::Number,
     Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
     ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
@@ -92,7 +92,7 @@ function complete_fields(
     βf′ₜ4fₜ = create_βf′ₜ4fₜ(ft, ω, Ps, ∇̽s, πcmps)
     f′ₜ = (βf′ₜ4fₜ * fₜ) ./ β
 
-    eₜ, hₜ = ft==EE ? (fₜ,f′ₜ) : (f′ₜ,fₜ)
+    eₜ, hₜ = ft==Efield() ? (fₜ,f′ₜ) : (f′ₜ,fₜ)
 
     # Calculate the longitudinal component of the H-field.
     ⅈhₗ4eₜ = create_ⅈhₗ4eₜ(ω, Ps, ∇̽s)  # matrix
@@ -128,13 +128,13 @@ function poynting_complex(
 
     # Calculate S₁.
     S₁ = Array{ComplexF64}(undef, size(grid))  # vector
-    m̂₁H₃ = Ftemp; interp_field!(m̂₁H₃, H₃, HH, dir₁, ∆l, ∆l⁻¹, boundft, isbloch)
+    m̂₁H₃ = Ftemp; interp_field!(m̂₁H₃, H₃, Hfield(), dir₁, ∆l, ∆l⁻¹, boundft, isbloch)
     S₁ .= E₂ .* conj.(m̂₁H₃)
 
     # Calculate S₃.
     S₃ = Array{ComplexF64}(undef, size(grid))  # vector
     S₃₋ = Ftemp; S₃₋ .= E₂ .* conj.(H₁)  # real array located at E₂
-    interp_field!(S₃, S₃₋, EE, dir₁, ∆l, ∆l⁻¹, boundft, isbloch, α=-1)
+    interp_field!(S₃, S₃₋, Efield(), dir₁, ∆l, ∆l⁻¹, boundft, isbloch, α=-1)
 
     return S₁, S₃
 end

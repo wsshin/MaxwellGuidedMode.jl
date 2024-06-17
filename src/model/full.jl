@@ -7,7 +7,7 @@ const ModelFull{P,AP} = Model{2,3,3, 2,2, 1,1, 4,4, P,AP}
 
 # Convenience constructor
 function ModelFull(grid::Grid; APtype::Type=Array{ComplexF64,4})
-    ft_eq = EE
+    ft_eq = Efield()
 
     cmpₑₜ = SVector(1,2)  # transverse E-field (1st and 2nd components)
     cmpₘₜ = SVector(1,2)  # transverse H-field (1st and 2nd components)
@@ -33,8 +33,8 @@ function calc_matparams!(mdl::ModelFull)
     @unpack isbloch, N, l, σ, ghosted = grid
     @unpack lg, τlg, ∆τ = ghosted
 
-    gtₑ = gt4ft.(EE,boundft)
-    gtₘ = gt4ft.(HH,boundft)
+    gtₑ = gt4ft.(Efield(),boundft)
+    gtₘ = gt4ft.(Hfield(),boundft)
 
     εₜ4εind = sub_matprm4pind(ε4εind, cmpₑₜ)
     εₗ4εind = sub_matprm4pind(ε4εind, cmpₑₗ)
@@ -91,7 +91,7 @@ end
 function complete_fields(
     β::Number,  # propagation constant
     fₜ::AbstractVector{<:Number},  # calculated transverse field Fₜ as column vector
-    ft::FieldType,  # type of input field Fₜ
+    ft::AbstractFieldType,  # type of input field Fₜ
     ω::Number,
     Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
     ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
@@ -135,7 +135,7 @@ function complete_fields(
     F = (F₁, F₂, F₃)
     F′ = (F′₁, F′₂, F′₃)
 
-    E, H = ft==EE ? (F,F′) : (F′,F)
+    E, H = ft==Efield() ? (F,F′) : (F′,F)
 
     return (E=E, H=H)
 end
@@ -166,35 +166,35 @@ function poynting_complex(
     # Calculate S₁.
     S₁ = Array{ComplexF64}(undef, size(grid))  # matrix
 
-    m̂₁H₃ = Ftemp; interp_field!(m̂₁H₃, H₃, HH, dir₁, ∆l, ∆l⁻¹, boundft, isbloch)  # intepolate H₃ at E₂-locations
+    m̂₁H₃ = Ftemp; interp_field!(m̂₁H₃, H₃, Hfield(), dir₁, ∆l, ∆l⁻¹, boundft, isbloch)  # intepolate H₃ at E₂-locations
     S₁ .= E₂ .* conj.(m̂₁H₃)  # E₂H₃ evaluated at centers of edges normal to direction 1
 
-    m̂₁H₂ = Ftemp; interp_field!(m̂₁H₂, H₂, HH, dir₁, ∆l, ∆l⁻¹, boundft, isbloch)  # intepolate H₂ at E₃-locations
+    m̂₁H₂ = Ftemp; interp_field!(m̂₁H₂, H₂, Hfield(), dir₁, ∆l, ∆l⁻¹, boundft, isbloch)  # intepolate H₂ at E₃-locations
     m̂₁H₂ .= E₃ .* conj.(m̂₁H₂)  # E₃H₂ evaluated at end points of edges normal to direction 1; need to be interpolated at edge centers
     S₁₋ = m̂₁H₂
 
-    interp_field!(S₁, S₁₋, EE, dir₂, ∆l, ∆l⁻¹, boundft, isbloch, α=-1, overwrite=false)  # interpolate S₁₋ at centers of edges normal to direction 1
+    interp_field!(S₁, S₁₋, Efield(), dir₂, ∆l, ∆l⁻¹, boundft, isbloch, α=-1, overwrite=false)  # interpolate S₁₋ at centers of edges normal to direction 1
 
     # Calculate S₂.
     S₂ = Array{ComplexF64}(undef, size(grid))  # matrix
 
-    m̂₂H₃ = Ftemp; interp_field!(m̂₂H₃, H₃, HH, dir₂, ∆l, ∆l⁻¹, boundft, isbloch)  # intepolate H₃ at E₁-locations
+    m̂₂H₃ = Ftemp; interp_field!(m̂₂H₃, H₃, Hfield(), dir₂, ∆l, ∆l⁻¹, boundft, isbloch)  # intepolate H₃ at E₁-locations
     S₂ .= -1 .* E₁ .* conj.(m̂₂H₃)  # E₁H₃ evaluated at centers of edges normal to direction 2
 
-    m̂₂H₁ = Ftemp; interp_field!(m̂₂H₁, H₁, HH, dir₂, ∆l, ∆l⁻¹, boundft, isbloch)  # intepolate H₁ at E₃-locations
+    m̂₂H₁ = Ftemp; interp_field!(m̂₂H₁, H₁, Hfield(), dir₂, ∆l, ∆l⁻¹, boundft, isbloch)  # intepolate H₁ at E₃-locations
     m̂₂H₁ .= E₃ .* conj.(m̂₂H₁)  # E₃H₁ evaluated at end points of edges normal to direction 2; need to be interpolated at edge centers
     S₂₊ = m̂₂H₁
 
-    interp_field!(S₂, S₂₊, EE, dir₁, ∆l, ∆l⁻¹, boundft, isbloch, overwrite=false)  # interpolate S₂₊ at centers of edges normal to direction 2
+    interp_field!(S₂, S₂₊, Efield(), dir₁, ∆l, ∆l⁻¹, boundft, isbloch, overwrite=false)  # interpolate S₂₊ at centers of edges normal to direction 2
 
     # Calculate S₃.
     S₃ = Array{ComplexF64}(undef, size(grid))  # matrix
 
     S₃₊ = Ftemp; S₃₊ .= E₁ .* conj.(H₂)  # E₁ and H₂ are already co-located
-    interp_field!(S₃, S₃₊, EE, dir₂, ∆l, ∆l⁻¹, boundft, isbloch)  # S₃₊ interpolated at centers of pixels
+    interp_field!(S₃, S₃₊, Efield(), dir₂, ∆l, ∆l⁻¹, boundft, isbloch)  # S₃₊ interpolated at centers of pixels
 
     S₃₋ = Ftemp; S₃₋ .= E₂ .* conj.(H₁)  # E₂ and H₁ are already co-located
-    interp_field!(S₃, S₃₋, EE, dir₁, ∆l, ∆l⁻¹, boundft, isbloch, α=-1, overwrite=false)  # S₃₋ interpolated at centers of pixels
+    interp_field!(S₃, S₃₋, Efield(), dir₁, ∆l, ∆l⁻¹, boundft, isbloch, α=-1, overwrite=false)  # S₃₋ interpolated at centers of pixels
 
     return S₁, S₂, S₃
 end

@@ -63,11 +63,11 @@ end
 function interp_field!(
     Gᵤ::AbstractArray{ComplexF64,K},  # where averaged fields are stored
     Fᵤ::AbstractArray{ComplexF64,K},  # field to average
-    ft::FieldType,  # type of field to average
+    ft::AbstractFieldType,  # type of field to average
     nw::Int,  # direction of averaging
     ∆l::NTuple{2,NTuple{K,Vector{Float64}}},
     ∆l⁻¹::NTuple{2,NTuple{K,Vector{Float64}}},
-    boundft::SVector{K,FieldType},
+    boundft::SVector{K,AbstractFieldType},
     isbloch::SVector{K,Bool};
     kwargs...  # keyword arguments for apply_m̂!()
 ) where {K}
@@ -91,7 +91,7 @@ function powerₗ_complex(
     S_complex = poynting_complex(E, H, mdl)
     Sₗ_complex = S_complex[end]
 
-    gtₑ = gt4ft.(HH, mdl.boundft)
+    gtₑ = gt4ft.(Hfield(), mdl.boundft)
     lvxl = t_ind(mdl.grid.ghosted.lg, gtₑ)  # locations of x-normal edges of E-field pixels surrounding Sz
 
     vc = VoxelwiseConstant(Sₗ_complex, lvxl)

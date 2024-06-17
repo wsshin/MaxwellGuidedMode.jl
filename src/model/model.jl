@@ -20,7 +20,7 @@ function poynting_complex end
     ωpml::Number = 0.0  # can be complex
 
     # Field type of equation
-    ft_eq::FieldType
+    ft_eq::AbstractFieldType
 
     # Grid
     grid::Grid{K}
@@ -33,7 +33,7 @@ function poynting_complex end
     cmpₘₗ::SVector{Kₘₗ,Int}  # Cartesian components of longitudinal H-field
 
     # Boundary properties (in transverse directions)
-    boundft::SVector{K,FieldType} = fill(EE, SVector{K})
+    boundft::SVector{K,AbstractFieldType} = fill(Efield(), SVector{K})
     Npml::NTuple{2,SVector{K,Int}} = (zeros(SVector{K,Int}), zeros(SVector{K,Int}))
     kbloch::SVector{K,Float64} = zeros(SVector{K,Float64})  # [kx_bloch, ky_bloch, kz_bloch]
 
@@ -60,19 +60,19 @@ function poynting_complex end
     cmpfirst::Bool = true
 end
 
-function Base.size(mdl::Model{K,Kₑ,Kₘ,Kₑₜ,Kₘₜ}, ft::FieldType) where {K,Kₑ,Kₘ,Kₑₜ,Kₘₜ}
-    Kf = ft==EE ? Kₑₜ : Kₘₜ
+function Base.size(mdl::Model{K,Kₑ,Kₘ,Kₑₜ,Kₘₜ}, ft::AbstractFieldType) where {K,Kₑ,Kₘ,Kₑₜ,Kₘₜ}
+    Kf = ft==Efield() ? Kₑₜ : Kₘₜ
     sz_grid = size(mdl.grid)
     sz = mdl.cmpfirst ? (Kf, sz_grid...) : (sz_grid..., Kf)
 
     return sz
 end
 
-Base.length(mdl::Model, ft::FieldType) = prod(size(mdl, ft))
+Base.length(mdl::Model, ft::AbstractFieldType) = prod(size(mdl, ft))
 
 # Basic setters
 set_ωpml!(mdl::Model, ωpml::Number) = (mdl.ωpml = ωpml; nothing)
-set_boundft!(mdl::Model{K}, boundft::AbstractVector{FieldType}) where {K} = (mdl.boundft = SVector{K}(boundft); nothing)
+set_boundft!(mdl::Model{K}, boundft::AbstractVector{AbstractFieldType}) where {K} = (mdl.boundft = SVector{K}(boundft); nothing)
 set_Npml!(mdl::Model{K}, Npml::NTuple{2,AbstractVector{<:Integer}}) where {K} = (mdl.Npml = SVector{K}.(Npml); nothing)
 set_kbloch!(mdl::Model{K}, kbloch::AbstractVector{<:Real}) where {K} = (mdl.kbloch = SVector{K}(kbloch); nothing)
 
@@ -111,8 +111,8 @@ function MaxwellBase.add_obj!(
     ε::AbstractMatParam=1.0, μ::AbstractMatParam=1.0
 ) where {K}
     mat = Material(matname, ε=ε, μ=μ)
-    @argcheck isbidirectional(EE, mat, mdl)  # ε should not couple transverse and longitudinal fields
-    @argcheck isbidirectional(HH, mat, mdl)  # μ should not couple transverse and longitudinal fields
+    @argcheck isbidirectional(Efield(), mat, mdl)  # ε should not couple transverse and longitudinal fields
+    @argcheck isbidirectional(Hfield(), mat, mdl)  # μ should not couple transverse and longitudinal fields
 
     @unpack shp4oind, εind4oind, μind4oind, ε4εind, μ4μind = mdl
     for shp = shapes  # shapes is tuple
@@ -125,8 +125,7 @@ end
 
 # Returns true if the material parameter does not couple the transverse and longitudinal
 # components of the fields; false otherwise.
-function isbidirectional(ft::FieldType, mat::Material, mdl::Model)
-    nft = Int(ft)
+function isbidirectional(ft::AbstractFieldType, mat::Material, mdl::Model)
     @unpack cmpₑₜ, cmpₘₜ, cmpₑₗ, cmpₘₗ = mdl
 
     cmpₜ = (cmpₑₜ, cmpₘₜ)[nft]
@@ -145,8 +144,8 @@ function field2vec(
 ) where {K,Kₑ,Kₘ}
     @unpack ft_eq, cmpₑₜ, cmpₘₜ, cmpfirst = mdl
 
-    U = ft_eq==EE ? E : H
-    cmpᵤₜ = ft_eq==EE ? cmpₑₜ : cmpₘₜ
+    U = ft_eq==Efield() ? E : H
+    cmpᵤₜ = ft_eq==Efield() ? cmpₑₜ : cmpₘₜ
     Uₜ = cat(U[cmpᵤₜ]..., dims=K+1)
 
     if cmpfirst

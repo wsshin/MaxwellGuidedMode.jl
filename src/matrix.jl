@@ -9,8 +9,8 @@ function create_stretched_∆ls(mdl::Model)
     s∆l = create_stretched_∆l(ωpml, grid, Npml)
     s∆l⁻¹ = invert_∆l(s∆l)
 
-    gtₑ = gt4ft.(EE, boundft)
-    gtₘ = gt4ft.(HH, boundft)
+    gtₑ = gt4ft.(Efield(), boundft)
+    gtₘ = gt4ft.(Hfield(), boundft)
 
     s∆lₑ = t_ind(s∆l, gtₑ)  # stretched ∆l's centered at E-field plane locations
     s∆lₘ = t_ind(s∆l, gtₘ)  # stretched ∆l's centered at H-field plane locations
@@ -29,8 +29,8 @@ function create_paramops(mdl::Model{K,Kₑ,Kₘ,Kₑₜ,Kₘₜ}) where {K,Kₑ,
 
     e⁻ⁱᵏᴸ = create_e⁻ⁱᵏᴸ(mdl)
 
-    isfwd_inₑ = boundft.!=EE
-    isfwd_inₘ = boundft.!=HH
+    isfwd_inₑ = boundft.!=Efield()
+    isfwd_inₘ = boundft.!=Hfield()
 
     Pεₜ = Kₑₜ==1 ? create_paramop(εₜarr; cmpfirst) :
                   create_paramop(εₜarr, isfwd_inₑ, s∆lₘ, s∆lₑ⁻¹, isbloch, e⁻ⁱᵏᴸ; cmpfirst)
@@ -53,8 +53,8 @@ function create_curls(mdl::Model)
 
     e⁻ⁱᵏᴸ = create_e⁻ⁱᵏᴸ(mdl)
 
-    isfwdₑ = boundft.==EE
-    isfwdₘ = boundft.==HH
+    isfwdₑ = boundft.==Efield()
+    isfwdₘ = boundft.==Hfield()
 
     # The following lines work even if the model does not deal with the corresponding
     # longitudinal components.
@@ -84,14 +84,14 @@ create_ⅈhₗ4eₜ(
     Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
     ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}}
 ) =
-    create_ⅈf′ₗ4fₜ(EE, ω, Ps, ∇̽s)
+    create_ⅈf′ₗ4fₜ(Efield(), ω, Ps, ∇̽s)
 
 create_ⅈeₗ4hₜ(
     ω,
     Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
     ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}}
 ) =
-    create_ⅈf′ₗ4fₜ(HH, ω, Ps, ∇̽s)
+    create_ⅈf′ₗ4fₜ(Hfield(), ω, Ps, ∇̽s)
 
 create_ⅈf′ₗ4fₜ(
     ft, ω,
@@ -103,7 +103,7 @@ create_ⅈf′ₗ4fₜ(
 # Create the operator that generates im * F′ₗ from Fₜ, where F′ is the field complementary
 # to F (e.g., F′ = H-field for F = E-field).
 function create_ⅈf′ₗ4fₜ(
-    ft::FieldType,  # type of input field Fₜ, not output field F′ₗ
+    ft::AbstractFieldType,  # type of input field Fₜ, not output field F′ₗ
     ω::Number,
     Pₗs::NTuple{2,AbstractMatrix{<:Number}},
     ∇̽ₜs::NTuple{2,AbstractMatrix{<:Number}}
@@ -111,7 +111,7 @@ function create_ⅈf′ₗ4fₜ(
     nft = Int(ft)
     nft′ = alter(nft)
 
-    α = ft==EE ? -1/ω : 1/ω
+    α = ft==Efield() ? -1/ω : 1/ω
 
     P′ₗ = Pₗs[nft′]
     ∇̽ₜ = ∇̽ₜs[nft]
@@ -122,15 +122,15 @@ function create_ⅈf′ₗ4fₜ(
 end
 
 
-create_βhₜ4eₜ(ω, Ps, ∇̽s, πcmps) = create_βf′ₜ4fₜ(EE, ω, Ps, ∇̽s, πcmps)
-create_βeₜ4hₜ(ω, Ps, ∇̽s, πcmps) = create_βf′ₜ4fₜ(HH, ω, Ps, ∇̽s, πcmps)
+create_βhₜ4eₜ(ω, Ps, ∇̽s, πcmps) = create_βf′ₜ4fₜ(Efield(), ω, Ps, ∇̽s, πcmps)
+create_βeₜ4hₜ(ω, Ps, ∇̽s, πcmps) = create_βf′ₜ4fₜ(Hfield(), ω, Ps, ∇̽s, πcmps)
 
 # Create the operator that generates β * F′ₜ from Fₜ, where F′ is the field complementary to
 # F (e.g., F′ = H-field for F = E-field).
 create_βf′ₜ4fₜ(ft, ω, Ps, ∇̽s, πcmps) = sum(create_βf′ₜ4fₜ_comps(ft, ω, Ps, ∇̽s, πcmps))
 
 function create_βf′ₜ4fₜ_comps(
-    ft::FieldType,  # type of input field Fₜ, not output field F′ₗ
+    ft::AbstractFieldType,  # type of input field Fₜ, not output field F′ₗ
     ω::Number,
     Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
     ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
@@ -139,7 +139,7 @@ function create_βf′ₜ4fₜ_comps(
     nft = Int(ft)
     nft′ = alter(nft)
 
-    α = ft==EE ? ω : -ω
+    α = ft==Efield() ? ω : -ω
 
     Pₜs, Pₗs = Ps
     ∇̽ₜs, ∇̽ₗs = ∇̽s
@@ -161,7 +161,7 @@ function create_βf′ₜ4fₜ_comps(
 end
 
 function create_A(
-    ft::FieldType,  # type of input field Fₜ
+    ft::AbstractFieldType,  # type of input field Fₜ
     ω::Number,
     Ps::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
     ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
