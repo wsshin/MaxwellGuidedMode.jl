@@ -71,7 +71,7 @@ function interp_field!(
     isbloch::SVector{K,Bool};
     kwargs...  # keyword arguments for apply_m̂!()
 ) where {K}
-    nft = Int(ft); nft′ = alter(nft)
+    ft′ = conj(ft)
     isfwd = boundft[nw]==ft
     apply_m̂!(Gᵤ, Fᵤ, nw, isfwd, ∆l[nft][nw], ∆l⁻¹[nft′][nw], isbloch[nw]; kwargs...)
 

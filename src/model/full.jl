@@ -98,7 +98,7 @@ function complete_fields(
     πcmps::NTuple{2,AbstractMatrix{<:Number}},
     mdl::ModelFull
 )
-    ft′ = alter(ft)
+    ft′ = conj(ft)
 
     # Calculate the transverse components of the complementary field.
     βf′ₜ4fₜ = create_βf′ₜ4fₜ(ft, ω, Ps, ∇̽s, πcmps)

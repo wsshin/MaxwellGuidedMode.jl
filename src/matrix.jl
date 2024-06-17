@@ -108,8 +108,7 @@ function create_ⅈf′ₗ4fₜ(
     Pₗs::NTuple{2,AbstractMatrix{<:Number}},
     ∇̽ₜs::NTuple{2,AbstractMatrix{<:Number}}
 )
-    nft = Int(ft)
-    nft′ = alter(nft)
+    ft′ = conj(ft)
 
     α = ft==Efield() ? -1/ω : 1/ω
 
@@ -136,8 +135,7 @@ function create_βf′ₜ4fₜ_comps(
     ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
     πcmps::NTuple{2,AbstractMatrix{<:Number}}
 )
-    nft = Int(ft)
-    nft′ = alter(nft)
+    ft′ = conj(ft)
 
     α = ft==Efield() ? ω : -ω
 
@@ -167,7 +165,7 @@ function create_A(
     ∇̽s::NTuple{2,NTuple{2,AbstractMatrix{<:Number}}},
     πcmps::NTuple{2,AbstractMatrix{<:Number}}
 )
-    ft′ = alter(ft)
+    ft′ = conj(ft)
 
     # Old implementation.  Though more straightforward, this implementation does not
     # gurantee the vector calculus identity βfₜ4f′ₜ₂ * βf′ₜ4fₜ₂ = 0 due to rounding errors.
