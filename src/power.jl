@@ -73,7 +73,7 @@ function interp_field!(
 ) where {K}
     ft′ = conj(ft)
     isfwd = boundft[nw]==ft
-    apply_m̂!(Gᵤ, Fᵤ, nw, isfwd, ∆l[nft][nw], ∆l⁻¹[nft′][nw], isbloch[nw]; kwargs...)
+    apply_m̂!(Gᵤ, Fᵤ, nw, isfwd, ∆l[ft][nw], ∆l⁻¹[ft′][nw], isbloch[nw]; kwargs...)
 
     return nothing
 end

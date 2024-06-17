@@ -128,10 +128,10 @@ end
 function isbidirectional(ft::AbstractFieldType, mat::Material, mdl::Model)
     @unpack cmpₑₜ, cmpₘₜ, cmpₑₗ, cmpₘₗ = mdl
 
-    cmpₜ = (cmpₑₜ, cmpₘₜ)[nft]
-    cmpₗ = (cmpₑₗ, cmpₘₗ)[nft]
+    cmpₜ = (cmpₑₜ, cmpₘₜ)[ft]
+    cmpₗ = (cmpₑₗ, cmpₘₗ)[ft]
 
-    param = mat.param[nft]
+    param = mat.param[ft]
 
     return iszero(param[cmpₜ,cmpₗ]) && iszero(param[cmpₗ,cmpₜ])
 end

@@ -112,8 +112,8 @@ function create_ⅈf′ₗ4fₜ(
 
     α = ft==Efield() ? -1/ω : 1/ω
 
-    P′ₗ = Pₗs[nft′]
-    ∇̽ₜ = ∇̽ₜs[nft]
+    P′ₗ = Pₗs[ft′]
+    ∇̽ₜ = ∇̽ₜs[ft]
 
     L = α .* (P′ₗ \ ∇̽ₜ)
 
@@ -142,13 +142,13 @@ function create_βf′ₜ4fₜ_comps(
     Pₜs, Pₗs = Ps
     ∇̽ₜs, ∇̽ₗs = ∇̽s
 
-    Pₜ = Pₜs[nft]
-    ∇̽′ₗ = ∇̽ₗs[nft′]
-    πcmp = πcmps[nft]
+    Pₜ = Pₜs[ft]
+    ∇̽′ₗ = ∇̽ₗs[ft′]
+    πcmp = πcmps[ft]
 
     βf′ₜ4fₜ₁ = (α .* πcmp) * Pₜ
 
-    if length(Pₗs[nft′]) > 0
+    if length(Pₗs[ft′]) > 0
         ⅈf′ₗ4fₜ = create_ⅈf′ₗ4fₜ(ft, ω, Pₗs, ∇̽ₜs)
         βf′ₜ4fₜ₂ = (πcmp * ∇̽′ₗ) * ⅈf′ₗ4fₜ
     else
