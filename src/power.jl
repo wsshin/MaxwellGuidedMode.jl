@@ -67,7 +67,7 @@ function interp_field!(
     nw::Int,  # direction of averaging
     ∆l::NTuple{2,NTuple{K,Vector{Float64}}},
     ∆l⁻¹::NTuple{2,NTuple{K,Vector{Float64}}},
-    boundft::SVector{K,AbstractFieldType},
+    boundft::SVector{K,<:AbstractFieldType},
     isbloch::SVector{K,Bool};
     kwargs...  # keyword arguments for apply_m̂!()
 ) where {K}
