@@ -111,11 +111,11 @@ gₑy = gₑ[nY]
 gₘx = gₘ[nX]
 gₘy = gₘ[nY]
 
-xₑ = grid.l[Int(gₑx)][nX]
-yₑ = grid.l[Int(gₑy)][nY]
+xₑ = grid.l[gₑx][nX]
+yₑ = grid.l[gₑy][nY]
 
-xₘ = grid.l[Int(gₘx)][nX]
-yₘ = grid.l[Int(gₘy)][nY]
+xₘ = grid.l[gₘx][nX]
+yₘ = grid.l[gₘy][nY]
 
 fig = Figure()
 
@@ -176,7 +176,7 @@ heatmap!(xₘ, yₘ, abs.(Sz) ./ Smax, colormap=:bwr, colorrange=(-1,1))
 
 display(fig)
 
-xgₑ = grid.ghosted.lg[Int(gₑx)][nX]
-ygₑ = grid.ghosted.lg[Int(gₑy)][nY]
+xgₑ = grid.ghosted.lg[gₑx][nX]
+ygₑ = grid.ghosted.lg[gₑy][nY]
 
 Sz_pw = VoxelwiseConstant(Sz, (xgₑ,ygₑ))
