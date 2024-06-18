@@ -92,7 +92,7 @@ function powerₗ_complex(
     Sₗ_complex = S_complex[end]
 
     gtₑ = gt4ft.(Hfield(), mdl.boundft)
-    lvxl = t_ind(mdl.grid.ghosted.lg, gtₑ)  # locations of x-normal edges of E-field pixels surrounding Sz
+    lvxl = getindex_col(mdl.grid.ghosted.lg, gtₑ)  # locations of x-normal edges of E-field pixels surrounding Sz
 
     vc = VoxelwiseConstant(Sₗ_complex, lvxl)
     Pₗ_complex = integral(vc)

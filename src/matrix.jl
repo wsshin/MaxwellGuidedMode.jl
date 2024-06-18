@@ -12,10 +12,10 @@ function create_stretched_∆ls(mdl::Model)
     gtₑ = gt4ft.(Efield(), boundft)
     gtₘ = gt4ft.(Hfield(), boundft)
 
-    s∆lₑ = t_ind(s∆l, gtₑ)  # stretched ∆l's centered at E-field plane locations
-    s∆lₘ = t_ind(s∆l, gtₘ)  # stretched ∆l's centered at H-field plane locations
-    s∆lₑ⁻¹ = t_ind(s∆l⁻¹, gtₑ)
-    s∆lₘ⁻¹ = t_ind(s∆l⁻¹, gtₘ)
+    s∆lₑ = getindex_col(s∆l, gtₑ)  # stretched ∆l's centered at E-field plane locations
+    s∆lₘ = getindex_col(s∆l, gtₘ)  # stretched ∆l's centered at H-field plane locations
+    s∆lₑ⁻¹ = getindex_col(s∆l⁻¹, gtₑ)
+    s∆lₘ⁻¹ = getindex_col(s∆l⁻¹, gtₘ)
 
     return (s∆lₑ, s∆lₘ), (s∆lₑ⁻¹, s∆lₘ⁻¹)
 end
