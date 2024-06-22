@@ -72,7 +72,7 @@ Base.length(mdl::Model, ft::AbstractFieldType) = prod(size(mdl, ft))
 
 # Basic setters
 set_ωpml!(mdl::Model, ωpml::Number) = (mdl.ωpml = ωpml; nothing)
-set_boundft!(mdl::Model{K}, boundft::AbstractVector{AbstractFieldType}) where {K} = (mdl.boundft = SVector{K}(boundft); nothing)
+set_boundft!(mdl::Model{K}, boundft::AbstractVector{<:AbstractFieldType}) where {K} = (mdl.boundft = SVector{K}(boundft); nothing)
 set_Npml!(mdl::Model{K}, Npml::NTuple{2,AbstractVector{<:Integer}}) where {K} = (mdl.Npml = SVector{K}.(Npml); nothing)
 set_kbloch!(mdl::Model{K}, kbloch::AbstractVector{<:Real}) where {K} = (mdl.kbloch = SVector{K}(kbloch); nothing)
 
