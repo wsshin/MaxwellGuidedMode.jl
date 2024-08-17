@@ -74,8 +74,8 @@ nX = 1
 gtₑ = gt4ft.(mdl.boundft[nX], Efield())
 gtₘ = gt4ft.(mdl.boundft[nX], Hfield())
 
-xₑ = grid.l[Int(gtₑ)][nX]
-xₘ = grid.l[Int(gtₘ)][nX]
+xₑ = grid.l[gtₑ][nX]
+xₘ = grid.l[gtₘ][nX]
 
 fig = Figure()
 
