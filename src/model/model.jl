@@ -1,5 +1,4 @@
 export set_ωpml!, set_boundft!, set_Npml!, set_kbloch!  # basic setter functions
-export create_e⁻ⁱᵏᴸ
 export clear_objs!  # plural because clearing both electric and magnetic quantities
 export complete_fields
 
@@ -75,11 +74,6 @@ set_ωpml!(mdl::Model, ωpml::Number) = (mdl.ωpml = ωpml; nothing)
 set_boundft!(mdl::Model{K}, boundft::AbstractVector{<:AbstractFieldType}) where {K} = (mdl.boundft = SVector{K}(boundft); nothing)
 set_Npml!(mdl::Model{K}, Npml::NTuple{2,AbstractVector{<:Integer}}) where {K} = (mdl.Npml = SVector{K}.(Npml); nothing)
 set_kbloch!(mdl::Model{K}, kbloch::AbstractVector{<:Real}) where {K} = (mdl.kbloch = SVector{K}(kbloch); nothing)
-
-create_e⁻ⁱᵏᴸ(mdl::Model{K}) where {K} =
-    iszero(mdl.kbloch) ?
-        ones(SVector{K,Float64}) :
-        exp.(-im .* mdl.kbloch .* mdl.grid.L)
 
 # Main functions
 function clear_objs!(mdl::Model)

@@ -27,7 +27,7 @@ function create_paramops(mdl::Model{K,Kₑ,Kₘ,Kₑₜ,Kₘₜ}) where {K,Kₑ,
     @unpack grid, boundft, εₜarr, μₜarr, εₗarr, μₗarr, cmpfirst = mdl
     isbloch = grid.isbloch
 
-    e⁻ⁱᵏᴸ = create_e⁻ⁱᵏᴸ(mdl)
+    e⁻ⁱᵏᴸ = create_e⁻ⁱᵏᴸ(mdl.kbloch, grid.L)
 
     isfwd_inₑ = boundft.!=Efield()
     isfwd_inₘ = boundft.!=Hfield()
@@ -51,7 +51,7 @@ function create_curls(mdl::Model)
     @unpack grid, boundft, cmpₑₜ, cmpₘₜ, cmpₑₗ, cmpₘₗ, cmpfirst = mdl
     isbloch = grid.isbloch
 
-    e⁻ⁱᵏᴸ = create_e⁻ⁱᵏᴸ(mdl)
+    e⁻ⁱᵏᴸ = create_e⁻ⁱᵏᴸ(mdl.kbloch, grid.L)
 
     isfwdₑ = boundft.==Efield()
     isfwdₘ = boundft.==Hfield()
