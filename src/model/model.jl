@@ -1,6 +1,7 @@
 export set_ωpml!, set_boundft!, set_Npml!, set_kbloch!  # basic setter functions
 export clear_objs!  # plural because clearing both electric and magnetic quantities
 export complete_fields
+export vismode!
 
 # Implement the following functions for each specific Model.
 function calc_matparams! end

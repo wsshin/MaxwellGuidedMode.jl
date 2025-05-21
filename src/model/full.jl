@@ -198,3 +198,75 @@ function poynting_complex(
 
     return S₁, S₂, S₃
 end
+
+function vismode!(
+    fig::Figure,
+    E::NTuple{3,AbstractArray{<:Complex,2}},
+    H::NTuple{3,AbstractArray{<:Complex,2}},
+    mdl::ModelFull,
+    unit::MaxwellUnit;
+    transform::Any=abs,
+    plot_theme=Theme(),
+    shapes::AbstractVector{<:Shape}=Shape[]
+)
+    Ex, Ey, Ez = E
+    Hx, Hy, Hz = H
+
+    grid = mdl.grid
+    boundft = mdl.boundft
+
+    # Below, different Cartesian components are defined at diffeernt locations, so the Enorm
+    # calculation is not accurate.
+    Enorm = .√(+).(abs2.(Ex), abs2.(Ey), abs2.(Ez))
+    Emax = maximum(Enorm)
+
+    Hnorm = .√(+).(abs2.(Hx), abs2.(Hy), abs2.(Hz))
+    Hmax = maximum(Hnorm)
+
+    nX, nY = 1, 2
+
+    gₑ = gt4ft.(boundft, Efield())
+    gₘ = gt4ft.(boundft, Hfield())
+
+    gₑx = gₑ[nX]
+    gₑy = gₑ[nY]
+
+    gₘx = gₘ[nX]
+    gₘy = gₘ[nY]
+
+    xₑ = grid.l[gₑx][nX] .* unit.L
+    yₑ = grid.l[gₑy][nY] .* unit.L
+
+    xₘ = grid.l[gₘx][nX] .* unit.L
+    yₘ = grid.l[gₘy][nY] .* unit.L
+
+    with_theme(plot_theme) do
+        fig[1,1] = Axis(fig, title="Ex")
+        heatmap!(xₘ, yₑ, transform.(Ex) ./ Emax)
+        drawshape!.(shapes, color=:lightgreen)
+
+        fig[1,2] = Axis(fig, title="Ey")
+        heatmap!(xₑ, yₘ, transform.(Ey) ./ Emax)
+        drawshape!.(shapes, color=:lightgreen)
+
+        fig[1,3] = Axis(fig, title="Ez")
+        heatmap!(xₑ, yₑ, transform.(Ez) ./ Emax)
+        drawshape!.(shapes, color=:lightgreen)
+
+        fig[2,1] = Axis(fig, title="Hx")
+        heatmap!(xₑ, yₘ, transform.(Hx) ./ Hmax)
+        drawshape!.(shapes, color=:lightgreen)
+
+        fig[2,2] = Axis(fig, title="Hy")
+        heatmap!(xₘ, yₑ, transform.(Hy) ./ Hmax)
+        drawshape!.(shapes, color=:lightgreen)
+
+        fig[2,3] = Axis(fig, title="Hz")
+        heatmap!(xₘ, yₘ, transform.(Hz) ./ Hmax)
+        drawshape!.(shapes, color=:lightgreen)
+
+        # Colorbar(fig[1,4], hm3)
+    end  # do
+
+    return nothing
+end

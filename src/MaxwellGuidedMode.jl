@@ -8,6 +8,7 @@ using StaticArrays
 using Parameters
 using ArgCheck
 using Arpack
+using Makie
 
 import LinearAlgebra: normalize!
 
